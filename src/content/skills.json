@@ -1,5 +1,5 @@
 {
-  "_note": "Only skills shown in a public repo or a featured project. `evidence` is the project(s) to point an interviewer to. No progress bars or levels. Excluded on purpose: PyTorch, MLflow, AWS, Kafka, NATS, Tableau (no public code), and tools used only in unpublished work.",
+  "_note": "Only skills shown in a public repo or a featured project. `evidence` is the project(s) to point an interviewer to. No progress bars or levels. Excluded on purpose (no code to show): PyTorch, MLflow, AWS, Kafka, NATS, Tableau.",
   "groups": [
     {
       "title": "Languages",
@@ -20,34 +20,39 @@
       "evidence": "TabulaView.ai statistics engine · Walking-Running and PUBG notebooks on GitHub"
     },
     {
-      "title": "LLM / GenAI",
+      "title": "AI & LLM engineering",
       "items": [
+        "Agentic workflows (Deep Agents / LangGraph, ReAct)",
         "LLM tool calling",
         "Structured JSON output",
         "Grounding checks against evidence",
         "Provider fallback (Groq → NVIDIA)",
         "Gemini API",
+        "OpenRouter / OpenAI APIs",
         "Embeddings & vector search (ChromaDB, Sentence Transformers)"
       ],
-      "evidence": "TabulaView.ai AI analyst · AI Email Assistant"
+      "evidence": "Lumen research agent · TabulaView.ai AI analyst · AI Email Assistant"
     },
     {
-      "title": "Data & engineering",
+      "title": "Backend, data & integration",
       "items": [
         "pandas",
         "NumPy",
         "Data-quality profiling",
         "FastAPI",
-        "PostgreSQL (Supabase, row-level security)",
+        "REST APIs & Server-Sent Events",
+        "PostgreSQL (SQLAlchemy; Supabase row-level security)",
+        "Redis caching",
+        "JWT authentication",
         "pytest",
         "Playwright"
       ],
-      "evidence": "TabulaView.ai (309 backend tests, Playwright journeys) · AI Email Assistant"
+      "evidence": "TabulaView.ai (309 backend tests, Playwright journeys) · Lumen (2 FastAPI services, Redis, PostgreSQL) · AI Email Assistant"
     },
     {
       "title": "Cloud & tools",
-      "items": ["Vercel", "Supabase", "Git & GitHub", "Power BI", "Jupyter"],
-      "evidence": "TabulaView.ai (live on Vercel, Supabase sign-in) · Bank Loan Report (Power BI) on GitHub"
+      "items": ["Docker & Docker Compose", "Vercel", "Supabase", "Git & GitHub", "Power BI", "Jupyter"],
+      "evidence": "Lumen (Docker Compose stack) · TabulaView.ai (live on Vercel, Supabase sign-in) · Bank Loan Report (Power BI) on GitHub"
     }
   ]
 }

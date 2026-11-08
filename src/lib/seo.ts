@@ -13,7 +13,7 @@ export function personJsonLd() {
     "@id": `${base()}/#person`,
     name: site.name,
     url: `${base()}/`,
-    jobTitle: "AI Engineer",
+    jobTitle: "Forward Deployed Engineer",
     description: site.tagline,
     email: `mailto:${site.links.email}`,
     sameAs: [site.links.github, site.links.linkedin],

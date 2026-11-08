@@ -1,0 +1,125 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import InquiryForm from "../components/InquiryForm.astro";
+import services from "../content/services.json";
+import { site } from "../lib/site";
+
+const { hero, why } = services;
+const ld = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  name: `${site.name}: AI solutions and business automation`,
+  url: new URL("/work-with-me/", Astro.site).href,
+  areaServed: "Worldwide (remote) · based in Bengaluru, India",
+  serviceType: services.services.map((s) => s.title),
+  provider: { "@type": "Person", name: site.name, url: new URL("/", Astro.site).href },
+};
+---
+
+<BaseLayout
+  title="Work with me: AI workflow automation and agents"
+  description="AI workflow automation, AI agents, RAG and knowledge systems, data integration and AI technical discovery, scoped around a defined deliverable."
+  jsonLd={ld}
+>
+  <section aria-labelledby="wwm-title" class="tone-dark bg-forest text-cream">
+    <div class="mx-auto max-w-(--container-content) px-4 pt-14 pb-16 sm:px-6 md:pt-20 md:pb-24 lg:px-8">
+      <p class="font-mono text-sm font-semibold tracking-[0.12em] text-cream-muted uppercase">{hero.eyebrow}</p>
+      <h1 id="wwm-title" class="mt-4 max-w-[22ch] text-h1">
+        {hero.title}
+      </h1>
+      <p class="mt-6 max-w-[44rem] text-lead text-cream-muted">{hero.intro}</p>
+      <div class="mt-10 flex flex-wrap items-center gap-4">
+        <a href={hero.cta.href} class="btn-primary">
+          {hero.cta.label} <span aria-hidden="true">→</span>
+        </a>
+        <a href="/#case-studies" class="link-underline font-semibold">
+          See the case studies
+        </a>
+      </div>
+      <p class="mt-10 max-w-[44rem] border-l-4 border-pink pl-4 text-base">{hero.honesty}</p>
+    </div>
+  </section>
+
+  <Section id="services" index={1} eyebrow="Services" title="What I can build for you">
+    <ul class="space-y-8">
+      {services.services.map((s, i) => (
+        <li class="rounded-2xl border border-line bg-cream-soft p-6 sm:p-8" data-reveal>
+          <article aria-labelledby={`svc-${i}`}>
+            <h3 id={`svc-${i}`} class="text-h3">
+              <span class="mr-3 font-mono text-base text-forest-muted" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              {s.title}
+            </h3>
+            <dl class="mt-6 grid gap-6 text-base md:grid-cols-2">
+              <div>
+                <dt class="font-semibold">The problem</dt>
+                <dd class="mt-1">{s.problem}</dd>
+              </div>
+              <div>
+                <dt class="font-semibold">What I implement</dt>
+                <dd class="mt-1">{s.solution}</dd>
+              </div>
+              <div>
+                <dt class="font-semibold">Example workflow</dt>
+                <dd class="mt-1 font-mono text-sm leading-relaxed">{s.example}</dd>
+              </div>
+              <div>
+                <dt class="font-semibold">Expected benefit</dt>
+                <dd class="mt-1">{s.benefit}</dd>
+              </div>
+              <div class="md:col-span-2">
+                <dt class="font-semibold">The engagement can include</dt>
+                <dd class="mt-2">
+                  <ul class="flex flex-wrap gap-2">
+                    {s.includes.map((x) => (
+                      <li class="rounded-full border border-line bg-cream px-3 py-1 text-sm">{x}</li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            </dl>
+            <p class="mt-6 text-sm">
+              Closest example of my work:{" "}
+              <a href={s.evidence.href} class="link-underline font-semibold">
+                {s.evidence.label}
+              </a>
+            </p>
+          </article>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section id="why" tone="dark" index={2} eyebrow="Why me" title={why.title}>
+    <ul class="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+      {why.items.map((w) => (
+        <li class="border-t-2 border-pink pt-4" data-reveal>
+          <h3 class="font-sans text-lg font-semibold">{w.title}</h3>
+          <p class="mt-2 text-base text-cream-muted">{w.text}</p>
+        </li>
+      ))}
+    </ul>
+  </Section>
+
+  <Section
+    id="inquiry"
+    tone="soft"
+    index={3}
+    eyebrow="Project inquiry"
+    title="Tell me about your workflow"
+    intro="A few questions so the first conversation is about your problem, not about filling in details. I read every inquiry myself."
+  >
+    <div class="max-w-3xl">
+      <InquiryForm />
+    </div>
+    <p class="mt-10 text-sm">
+      Hiring for a full-time role instead?{" "}
+      <a href="/#contact" class="link-underline font-semibold">
+        Use the contact form
+      </a>
+      .
+    </p>
+  </Section>
+</BaseLayout>

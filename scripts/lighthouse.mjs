@@ -11,7 +11,9 @@ import * as chromeLauncher from "chrome-launcher";
 
 const PORT = 4330;
 const BASE = `http://127.0.0.1:${PORT}`;
-const PAGES = ["/", "/projects/tabulaview/", "/projects/email-assistant/", "/404"];
+const PAGES = process.env.LH_PAGES
+  ? process.env.LH_PAGES.split(",")
+  : ["/", "/work-with-me/", "/projects/lumen/", "/projects/tabulaview/", "/projects/email-assistant/", "/404"];
 const RUNS = Number(process.env.LH_RUNS ?? 3);
 const EXPECTED = { "/404": ["is-crawlable"] };
 const CATS = ["performance", "accessibility", "best-practices", "seo"];

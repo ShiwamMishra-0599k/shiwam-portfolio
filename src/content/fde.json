@@ -1,0 +1,171 @@
+{
+  "_note": "Forward Deployed Engineer positioning (Shiwam's brief, 9 Nov 2026). Capability and service claims each name the project that shows them. No clients, testimonials or business outcomes are claimed: none exist yet.",
+  "hero": {
+    "identity": "Forward Deployed Engineer · AI Solutions & Business Automation",
+    "headline": "Turning complex business problems into production-ready AI solutions.",
+    "supporting": "I work at the intersection of AI engineering and business operations: finding the bottleneck, integrating the right system and automating the workflow, with tests and fallbacks so it keeps working when a model or an API doesn't.",
+    "ctaBusiness": { "label": "Let's solve a business problem", "href": "/work-with-me/#inquiry" },
+    "ctaCases": { "label": "Explore engineering case studies", "href": "/#case-studies" },
+    "ctaProfile": { "label": "Explore my engineering profile", "href": "/#profile" }
+  },
+  "credibility": {
+    "label": "What my work shows",
+    "items": [
+      { "title": "Agentic workflows", "evidence": "Lumen: ReAct loop over 8 live tools" },
+      { "title": "LLM integration with fallbacks", "evidence": "TabulaView.ai: Groq → NVIDIA → rules" },
+      {
+        "title": "Retrieval-augmented generation",
+        "evidence": "Email Assistant: past replies retrieved into the prompt"
+      },
+      { "title": "Data pipelines", "evidence": "TabulaView.ai: messy CSV/Excel to checked dashboards" },
+      { "title": "API integrations", "evidence": "Gmail, Exa, Tavily, Supabase, OpenRouter" },
+      { "title": "Tested, deployed apps", "evidence": "TabulaView.ai: live, 309 backend tests" }
+    ]
+  },
+  "pillars": {
+    "eyebrow": "What I do",
+    "title": "Engineering AI solutions around real business problems.",
+    "intro": "Four kinds of problem I build for. Each names the work on this site that shows it.",
+    "items": [
+      {
+        "title": "AI workflow automation",
+        "problem": "People spend hours sorting, summarising and answering routine items by hand: emails, requests, reports.",
+        "solution": "An LLM pipeline that labels, summarises and drafts, with clear rules for what a person must still decide.",
+        "value": "Less time on routine work, with urgent items still reviewed by a person.",
+        "shownIn": { "label": "AI Email Assistant", "href": "/projects/email-assistant/" }
+      },
+      {
+        "title": "Knowledge and retrieval systems",
+        "problem": "Answers live across documents, past messages and the web, and a model on its own answers from stale memory.",
+        "solution": "Retrieval and search tools that put the right context in front of the model, with sources cited.",
+        "value": "Answers people can check, built on current information.",
+        "shownIn": { "label": "Lumen", "href": "/projects/lumen/" }
+      },
+      {
+        "title": "AI agents and intelligent applications",
+        "problem": "Multi-step tasks (research, comparison, monitoring) need several tools and judgement, not one prompt.",
+        "solution": "An agent loop with typed tools, caching, provider fallbacks and progress the user can follow.",
+        "value": "Research and lookups that run in minutes and show their working.",
+        "shownIn": { "label": "Lumen", "href": "/projects/lumen/" }
+      },
+      {
+        "title": "Data integration and messy-data cleanup",
+        "problem": "Business data sits in spreadsheets with mixed formats, missing values and inconsistent labels.",
+        "solution": "Pipelines that parse, profile and flag bad records instead of silently changing them, then compute KPIs in code.",
+        "value": "Numbers people can trust, and a clear list of what's wrong with the data.",
+        "shownIn": { "label": "TabulaView.ai", "href": "/projects/tabulaview/" }
+      }
+    ]
+  },
+  "cases": {
+    "eyebrow": "Engineering case studies",
+    "title": "Real systems, the decisions behind them, and what still isn't solved.",
+    "intro": "Each case study covers the problem, the architecture, the hard parts, how it handles failure, and an honest account of what's measured and what isn't."
+  },
+  "process": {
+    "eyebrow": "How I work",
+    "title": "From a bottleneck to a system people rely on.",
+    "steps": [
+      {
+        "n": "01",
+        "title": "Discover",
+        "text": "Understand the workflow, the systems, the data and where time is really lost, before choosing any tool.",
+        "example": "TabulaView.ai started from what breaks in real spreadsheets: ten kinds of 'missing', Indian digit grouping, day-first dates."
+      },
+      {
+        "n": "02",
+        "title": "Architect",
+        "text": "Pick the simplest design that fits the constraints: cost, rate limits, data privacy, who maintains it.",
+        "example": "TabulaView.ai keeps no files on the server: the browser re-sends the file, so 'we don't store your data' is literally true."
+      },
+      {
+        "n": "03",
+        "title": "Integrate",
+        "text": "Connect the APIs, databases and AI services the work depends on, each behind a clear interface.",
+        "example": "Lumen wires 8 external tools behind one cached interface the agent can call."
+      },
+      {
+        "n": "04",
+        "title": "Deploy",
+        "text": "Ship it with tests, timeouts and fallbacks, so one failing provider doesn't take the system down.",
+        "example": "TabulaView.ai is live on Vercel with 309 backend tests and a Groq → NVIDIA → rules fallback."
+      },
+      {
+        "n": "05",
+        "title": "Optimize",
+        "text": "Measure it, compare against a baseline and fix what the numbers show, including when the AI loses.",
+        "example": "TabulaView.ai's scorecard showed the AI analyst scoring 69.6 and 75.6 against the rules' 100, so the rules built the dashboard."
+      }
+    ]
+  },
+  "supporting": {
+    "eyebrow": "More projects",
+    "title": "Applied machine learning and smaller builds",
+    "items": [
+      {
+        "name": "AI Email Assistant",
+        "text": "Gmail + Gemini + ChromaDB: summarises, labels and drafts replies, and leaves urgent mail to a person.",
+        "fact": "4 LLM tasks per email · structured JSON labels",
+        "href": "/projects/email-assistant/",
+        "linkLabel": "Read the case study"
+      },
+      {
+        "name": "H1N1 and seasonal flu vaccine prediction",
+        "text": "Predicts vaccine uptake from survey answers, with imputation and encoding fitted inside cross-validation to avoid leakage.",
+        "fact": "Test ROC-AUC 0.835 (H1N1) and 0.861 (seasonal), from the notebook's saved outputs",
+        "note": "Repo kept private until the notebook is cleaned up"
+      },
+      {
+        "name": "Walking vs running classification",
+        "text": "Classifies activity from wrist accelerometer and gyroscope readings, comparing logistic regression, random forest, an MLP and an LSTM.",
+        "fact": "88,588 sensor readings · random forest 98.8% test accuracy on 17,718 held-out rows (saved notebook output)",
+        "href": "https://github.com/ShiwamMishra-0599k/Walking-Running-Classification-Motion-Sensor-ML-Model",
+        "linkLabel": "View the notebook on GitHub"
+      }
+    ]
+  },
+  "profile": {
+    "eyebrow": "Engineering profile",
+    "title": "Engineering at the intersection of AI, systems and business.",
+    "summary": "AI engineer with 13 months of internships in agentic AI and data science, and a B.Pharm from BIT Mesra. I build LLM features into tested, deployed applications, and I'm aiming that work at healthcare and operations data.",
+    "experience": [
+      {
+        "role": "AI Engineer Intern",
+        "org": "Tipstat",
+        "place": "Bengaluru (onsite)",
+        "dates": "Mar 2026 – Sep 2026",
+        "points": [
+          "Co-developed Lumen, a research agent using a Deep Agents (LangGraph) ReAct loop across 8 custom tools with a 3-tier search fallback (Exa, Tavily, DuckDuckGo).",
+          "Built 14 endpoints across 2 FastAPI services, streaming agent progress to a React/TypeScript UI over Server-Sent Events with 4 response block types.",
+          "Implemented Redis caching with per-tool expiry from 5 minutes to 24 hours, and modelled 3 core entities in PostgreSQL with JWT authentication."
+        ],
+        "link": { "label": "Lumen case study", "href": "/projects/lumen/" }
+      },
+      {
+        "role": "Data Science Intern",
+        "org": "Rubixe",
+        "place": "",
+        "dates": "Sep 2025 – Feb 2026",
+        "points": [
+          "Delivered 4 end-to-end machine learning projects across healthcare, motion-sensor, gaming and image data, from EDA to model evaluation.",
+          "Processed datasets of up to 88,588 records with Python and SQL: joins, aggregations, imputation and consistency checks.",
+          "Presented trends and model results through KPI reports and dashboards in Power BI and Tableau."
+        ]
+      }
+    ]
+  },
+  "dualCta": {
+    "hiring": {
+      "eyebrow": "For companies hiring",
+      "title": "Looking for an engineer who can bridge AI engineering and real-world deployment?",
+      "primary": { "label": "Discuss an opportunity", "href": "/#contact" },
+      "secondaryLabel": "Download resume"
+    },
+    "business": {
+      "eyebrow": "For businesses",
+      "title": "Have a manual workflow or an operational bottleneck that AI could solve?",
+      "primary": { "label": "Discuss your project", "href": "/work-with-me/#inquiry" },
+      "secondary": { "label": "See how I'd approach it", "href": "/work-with-me/" }
+    }
+  }
+}

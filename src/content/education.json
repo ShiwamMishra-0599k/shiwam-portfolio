@@ -1,5 +1,5 @@
 {
-  "_note": "Exactly the list Shiwam confirmed on 8 Nov 2026. No CGPA. Certificate dates left out until Shiwam verifies them (add a `date` field then).",
+  "_note": "Shiwam's 8 Nov 2026 list plus the IABAC certificate from his resume (9 Nov 2026). No CGPA. Certificate dates left out until Shiwam verifies them (add a `date` field then).",
   "degrees": [
     {
       "title": "Bachelor of Pharmacy (B.Pharm)",
@@ -16,6 +16,7 @@
     }
   ],
   "certifications": [
+    { "title": "Certified Data Scientist", "issuer": "IABAC" },
     { "title": "Google Data Analytics Professional Certificate", "issuer": "Google · Coursera" },
     { "title": "Career Essentials in Generative AI", "issuer": "Microsoft & LinkedIn" },
     { "title": "Career Essentials in Data Analysis", "issuer": "Microsoft & LinkedIn" }

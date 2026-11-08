@@ -1,0 +1,40 @@
+---
+import Section from "./Section.astro";
+import fde from "../content/fde.json";
+
+const { pillars } = fde;
+---
+
+<Section id="what-i-do" index={1} eyebrow={pillars.eyebrow} title={pillars.title} intro={pillars.intro}>
+  <ul class="grid gap-8 md:grid-cols-2">
+    {pillars.items.map((p, i) => (
+      <li
+        class="flex flex-col rounded-2xl border border-line bg-cream-soft p-6 sm:p-8"
+        data-reveal
+        style={`--reveal-delay:${(i % 2) * 90}ms`}
+      >
+        <h3 class="text-h3">{p.title}</h3>
+        <dl class="mt-5 space-y-4 text-base">
+          <div>
+            <dt class="font-mono text-xs font-semibold tracking-[0.12em] text-forest-muted uppercase">The problem</dt>
+            <dd class="mt-1">{p.problem}</dd>
+          </div>
+          <div>
+            <dt class="font-mono text-xs font-semibold tracking-[0.12em] text-forest-muted uppercase">What I build</dt>
+            <dd class="mt-1">{p.solution}</dd>
+          </div>
+          <div>
+            <dt class="font-mono text-xs font-semibold tracking-[0.12em] text-forest-muted uppercase">The value</dt>
+            <dd class="mt-1">{p.value}</dd>
+          </div>
+        </dl>
+        <p class="mt-auto pt-6 text-sm">
+          Shown in{" "}
+          <a href={p.shownIn.href} class="link-underline font-semibold">
+            {p.shownIn.label}
+          </a>
+        </p>
+      </li>
+    ))}
+  </ul>
+</Section>

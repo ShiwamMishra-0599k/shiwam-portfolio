@@ -13,7 +13,7 @@ const found = import.meta.glob<{ default: ImageMetadata }>("../assets/portrait.{
 const portrait = Object.values(found)[0]?.default;
 ---
 
-<Section id="about" index={4} eyebrow="About" title={about.title}>
+<Section id="about" index={8} eyebrow="About" title={about.title}>
   <div
     class:list={["grid gap-12", portrait && "md:grid-cols-[minmax(0,1fr)_16rem] lg:grid-cols-[minmax(0,1fr)_20rem]"]}
   >

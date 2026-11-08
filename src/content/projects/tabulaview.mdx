@@ -2,6 +2,13 @@
 title: "Checked dashboards from messy spreadsheets, with AI findings verified against the data"
 name: "TabulaView.ai"
 summary: "Upload a CSV or Excel file and get data-quality checks, a KPI dashboard and a PDF or PowerPoint report. An optional AI analyst explains the data, and every number it writes is checked against evidence that Python computed."
+resultKind: "verified"
+overview:
+  problem: "Small businesses keep sales and bookings in spreadsheets. Getting answers means learning a BI tool, and an LLM asked to summarise a table can state figures that aren't in it."
+  solution: "Upload a CSV or Excel file and get data-quality checks, a KPI dashboard and a report. Python computes every number; an optional AI analyst explains them, and a grounding check rejects any figure it can't trace to evidence."
+  contribution: "Designed and built it end to end: data layer, statistics tools, AI analyst and grounding check, React frontend, tests and deployment. A collaborator made 3 of the 29 commits (UI pieces, credited below)."
+  projectType: "Personal project · live on Vercel"
+  challenge: "Letting an LLM explain data without letting it invent numbers, on free-tier model APIs that throttle and fail."
 result: "Live on Vercel with 309 backend tests. In live runs the scorecard kept unverifiable AI figures off the dashboard (rules-based 100 vs AI 69.6 and 75.6)."
 types: ["LLM/GenAI", "Data Analysis"]
 tech:
@@ -24,7 +31,7 @@ links:
   writeup: "https://github.com/ShiwamMishra-0599k/tabulavibe-ai/blob/main/docs/AGENT_WORKFLOW.md"
 cover: "../../assets/projects/tabulavibe/landing.png"
 coverAlt: "TabulaView.ai landing page: the headline 'Turn a spreadsheet into a verified dashboard', a sign-in-to-upload panel, and an example dashboard of synthetic retail sales with revenue by category."
-order: 1
+order: 2
 credits: "Shashank Chaubey contributed the floating navbar, the sign-in dialog, and the compact phone header with swipeable tabs (3 of the repo's 29 commits)."
 sources:
   - "Repo docs: PROJECT_SPEC.md, docs/ARCHITECTURE.md, docs/AGENT_WORKFLOW.md, docs/PROJECT_STATUS.md, docs/CHANGELOG.md (v0.7.1 'Measured live', 2026-10-23)"
@@ -37,7 +44,7 @@ updated: 2026-11-08
 import TabulaViewArchitecture from "../../components/case/TabulaViewArchitecture.astro";
 import ScoreBars from "../../components/case/ScoreBars.astro";
 
-## Problem and why it matters
+## The problem
 
 Small businesses such as shops, salons and clinics keep their sales and bookings in spreadsheets. Answering "what do bookings look like by month and by region?" usually means learning a BI tool. An LLM asked to summarise a table can state figures that aren't in it.
 
@@ -49,7 +56,7 @@ I wanted a tool that:
 
 > "I built TabulaVibe to explore how a data-heavy workflow could be made faster and more intuitive. My goal was to improve the underlying performance while making the overall experience more useful and efficient."
 
-## Data
+### The data it has to handle
 
 - **Users' own files:** CSV or Excel (first sheet only). Files are processed in memory for each request and **never stored**.
 - **Two synthetic sample datasets,** generated from a fixed seed. Both have deliberate quality issues (missing values, duplicates, invalid numbers, inconsistent labels), so the quality report has something to show:
@@ -63,18 +70,24 @@ I wanted a tool that:
   - day-first dates (`03/04/2024` is read as 3 April, with a visible note);
   - ambiguous values such as `1,2`, which are deliberately **not** treated as numbers.
 
-## Approach and architecture
+## The solution
 
-The backend is stateless. The browser keeps the file and sends it again with each request, so nothing needs to be stored on the server. Python does all the arithmetic. The AI analyst follows a 9-phase workflow, and code enforces a gate at the end of each phase.
-
-<TabulaViewArchitecture />
+TabulaView.ai turns an uploaded file into a quality report, a KPI dashboard and a PDF or PowerPoint report. Python does all the arithmetic. The AI analyst may only explain what Python has already computed, in four steps:
 
 1. **Profile:** inferred types, roles, missing values, invalid values, duplicates and label variants.
 2. **Analyse:** the LLM picks from 13 statistical tools, such as Welch's t-test, ANOVA, chi-square, correlation and trend. Python runs each tool and records the result as evidence (`E1`, `E2` …).
 3. **Ground:** every number in a finding must appear in the evidence it cites. Findings that fail are sent back for correction. If they still fail, they're flagged **"unverified"** and kept out of the overview.
 4. **Compare:** after an AI run, the rules-based analyst runs on the same file. A scorecard decides which analysis builds the dashboard.
 
-## Models, tools and key decisions
+## System architecture
+
+The backend is stateless. The browser keeps the file and sends it again with each request, so nothing needs to be stored on the server. Python does all the arithmetic. The AI analyst follows a 9-phase workflow, and code enforces a gate at the end of each phase.
+
+<TabulaViewArchitecture />
+
+## Engineering deep dive
+
+### Key decisions and trade-offs
 
 | Decision             | What I chose                                                                                                            | What I rejected, and why                                                                                                                                               |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -86,7 +99,9 @@ The backend is stateless. The browser keeps the file and sends it again with eac
 | Machine learning     | Descriptive statistics only. PCA and regression run only when justified                                                 | Predictive or causal claims from a single uploaded file                                                                                                                |
 | Hosting              | Vercel (live). An AWS SAM template is also prepared and tested in the official Lambda image                             | Deploying to AWS without an account set up for it. The template and deploy script are ready                                                                            |
 
-## Evaluation
+## Production engineering
+
+### How the AI is checked
 
 After every AI run, Python scores the AI analysis and the rules-based analysis on the same file:
 
@@ -120,14 +135,7 @@ The AI completed every phase in 2.5–4 minutes but lost on both samples. Some o
 
 Calculations are checked against hand-computed fixtures and an independent implementation using Python's `csv` module.
 
-## Results
-
-- **Live since 21 Oct 2026** at tabulavibe-ai.vercel.app, with Google and GitHub sign-in.
-- **18 API endpoints:** profile, analyse, export, AI analyst, Ask AI, reports and accounts.
-- **Ask AI:** a chat about the report. On Groq's free plan, live answers took 5–16 seconds, with every number checked against recomputed evidence.
-- **Reports** download as PDF or PowerPoint.
-
-## Deployment
+### Deployment and security
 
 - **Vercel (Hobby):** built from the GitHub `main` branch. FastAPI runs as a serverless function.
   - Uploads are capped at 3.5 MB on Vercel (the platform limit). A self-hosted install allows 100 MB.
@@ -138,7 +146,18 @@ Calculations are checked against hand-computed fixtures and an independent imple
   - Saved reports hold aggregates only, never rows.
 - **Secrets** live only in environment variables, and the browser never sees a key. A secret scan and dependency audits found nothing.
 
-## Limitations and what I'd do next
+## Business applications and impact
+
+**Measured so far:**
+
+- **Live since 21 Oct 2026** at tabulavibe-ai.vercel.app, with Google and GitHub sign-in.
+- **18 API endpoints:** profile, analyse, export, AI analyst, Ask AI, reports and accounts.
+- **Ask AI:** a chat about the report. On Groq's free plan, live answers took 5–16 seconds, with every number checked against recomputed evidence.
+- **Reports** download as PDF or PowerPoint.
+
+**Who it is for:** owners and analysts at small businesses who keep their numbers in spreadsheets and need a checked summary without learning a BI tool. No adoption or time-saved figures yet; those would come from real users.
+
+## Reflection and next steps
 
 - **The AI analyst lost to the rules on both samples.** The grounding check works, but the AI's findings need to get better. The evaluation also covers only two synthetic samples.
 - **Free-plan limits:**

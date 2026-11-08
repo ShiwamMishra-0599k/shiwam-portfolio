@@ -21,7 +21,7 @@
     "title": "From pharmacy to AI engineering",
     "paragraphs": [
       "I studied pharmacy at Birla Institute of Technology, Mesra (B.Pharm, 2024), then retrained in data science through an 8-month program with four capstone projects.",
-      "Since then I've moved from notebooks to applications: an AI email assistant built on Gmail, Gemini and ChromaDB, and TabulaView.ai, a tested, deployed data app where the AI's summaries are checked against the numbers it is describing.",
+      "Since then I've moved from notebooks to applications: Lumen, a research agent I co-developed during my internship at Tipstat; an AI email assistant built on Gmail, Gemini and ChromaDB; and TabulaView.ai, a tested, deployed data app where the AI's summaries are checked against the numbers it is describing.",
       "Pharmacy is still where I want to aim this: applying AI to healthcare data, where every claim has to be checked against its source. That habit runs through the projects on this site."
     ],
     "curious": {

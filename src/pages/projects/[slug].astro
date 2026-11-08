@@ -4,6 +4,7 @@ import { render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
 import TableWrap from "../../components/case/TableWrap.astro";
+import CodeBlock from "../../components/case/CodeBlock.astro";
 import { getProjects, relatedTo, type Project } from "../../lib/projects";
 import { projectJsonLd } from "../../lib/seo";
 
@@ -19,7 +20,12 @@ interface Props {
 const { project, all } = Astro.props;
 const { data } = project;
 const { Content, headings } = await render(project);
-const toc = [...headings.filter((h) => h.depth === 2), { depth: 2, slug: "links", text: "Links" }];
+const toc = [
+  { depth: 2, slug: "overview", text: "Executive overview" },
+  ...headings.filter((h) => h.depth === 2),
+  { depth: 2, slug: "links", text: "Links" },
+];
+const o = data.overview;
 const related = relatedTo(project, all);
 const updated = data.updated.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 ---
@@ -44,8 +50,8 @@ const updated = data.updated.toLocaleDateString("en-GB", { day: "numeric", month
               <span aria-hidden="true">/</span>
             </li>
             <li>
-              <a href="/#projects" class="link-underline">
-                Projects
+              <a href="/#case-studies" class="link-underline">
+                Case studies
               </a>{" "}
               <span aria-hidden="true">/</span>
             </li>
@@ -60,8 +66,10 @@ const updated = data.updated.toLocaleDateString("en-GB", { day: "numeric", month
         <p class="mt-6 max-w-3xl text-lead text-cream-muted">{data.summary}</p>
 
         <p class="mt-8 max-w-3xl border-l-4 border-pink pl-4 text-lead">
-          <span class="sr-only">Result: </span>
-          {data.result}
+          <span class="block text-sm font-semibold tracking-[0.14em] text-cream-muted uppercase">
+            {data.resultKind === "verified" ? "Verified result" : "Status · no measured outcome yet"}
+          </span>
+          <span class="mt-1 block">{data.result}</span>
         </p>
 
         <div class="mt-10 flex flex-wrap items-center gap-4">
@@ -85,8 +93,8 @@ const updated = data.updated.toLocaleDateString("en-GB", { day: "numeric", month
 
         <dl class="mt-12 grid gap-6 border-t border-line-dark pt-8 text-sm sm:grid-cols-2">
           <div>
-            <dt class="font-semibold tracking-[0.14em] text-cream-muted uppercase">Type</dt>
-            <dd class="mt-2">{data.types.join(" · ")}</dd>
+            <dt class="font-semibold tracking-[0.14em] text-cream-muted uppercase">Project type</dt>
+            <dd class="mt-2">{o.projectType}</dd>
           </div>
           <div>
             <dt class="font-semibold tracking-[0.14em] text-cream-muted uppercase">Stack</dt>
@@ -134,7 +142,22 @@ const updated = data.updated.toLocaleDateString("en-GB", { day: "numeric", month
         </aside>
 
         <div class="prose min-w-0">
-          <Content components={{ table: TableWrap }} />
+          <h2 id="overview">Executive overview</h2>
+          <dl class="not-prose mt-6 grid gap-6 rounded-2xl border border-line bg-cream-soft p-6 sm:grid-cols-2">
+            {[
+              ["The problem", o.problem],
+              ["The solution", o.solution],
+              ["My contribution", o.contribution],
+              ["Main engineering challenge", o.challenge],
+            ].map(([k, v]) => (
+              <div>
+                <dt class="text-sm font-semibold tracking-[0.14em] text-forest-muted uppercase">{k}</dt>
+                <dd class="mt-2 text-base leading-relaxed">{v}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <Content components={{ table: TableWrap, pre: CodeBlock }} />
 
           <h2 id="links">Links</h2>
           <ul>

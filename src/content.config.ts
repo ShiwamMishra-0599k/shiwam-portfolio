@@ -20,6 +20,19 @@ const projects = defineCollection({
         summary: z.string().max(240),
         /** One-line result. Every number must trace to a source listed in `sources`. */
         result: z.string().max(200),
+        /** "verified": measured and sourced. "intended": what it is for; no measured outcome yet. */
+        resultKind: z.enum(["verified", "intended"]).default("verified"),
+        /** Executive overview shown at the top of the case study and on the featured cards. */
+        overview: z.object({
+          problem: z.string().max(260),
+          solution: z.string().max(260),
+          /** What Shiwam did himself. Be exact for team or employer work. */
+          contribution: z.string().max(300),
+          /** e.g. "Personal project, live" or "Internship project at Tipstat, co-developed". */
+          projectType: z.string().max(90),
+          /** The main engineering challenge, one sentence. */
+          challenge: z.string().max(220),
+        }),
         types: z.array(z.enum(PROJECT_TYPES)).min(1),
         tech: z.array(z.string()).min(1).max(12),
         /** Only public, cleaned repos. Leave out rather than link something private. */

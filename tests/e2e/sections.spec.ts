@@ -12,8 +12,7 @@ test("skills: every group and item from skills.json, each with evidence; no prog
   await expect(section.getByText("Shown in:")).toHaveCount(skills.groups.length);
   await expect(page.locator("progress, [role=progressbar], [role=meter]")).toHaveCount(0);
   const text = (await section.innerText()).toLowerCase();
-  for (const unshown of ["pytorch", "mlflow", "aws", "kafka", "nats", "tableau", "langgraph"])
-    expect(text).not.toContain(unshown);
+  for (const unshown of ["pytorch", "mlflow", "aws", "kafka", "nats", "tableau"]) expect(text).not.toContain(unshown);
 });
 
 test("education: exactly the confirmed degree, training and certificates; no CGPA or dates on certificates", async ({
@@ -26,7 +25,6 @@ test("education: exactly the confirmed degree, training and certificates; no CGP
   for (const c of education.certifications) await expect(section).toContainText(c.title);
   const text = (await section.innerText()).toLowerCase();
   expect(text).not.toContain("cgpa");
-  expect(text).not.toContain("rubixe"); // internship switch is off by default
 });
 
 test("open source / writing section is hidden (none yet)", async ({ page }) => {

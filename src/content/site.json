@@ -1,8 +1,8 @@
 {
   "name": "Shiwam Mishra",
-  "role": "AI Engineer · Data Scientist",
-  "tagline": "AI Engineer who ships tested, deployed LLM and data apps",
-  "status": "Open to AI Engineer / Data Scientist roles",
+  "role": "Forward Deployed Engineer · AI Solutions & Business Automation",
+  "tagline": "Turning complex business problems into production-ready AI solutions",
+  "status": "Open to Forward Deployed / AI Engineer roles and project work",
   "location": "Bengaluru, India · open to remote",
   "url": "https://shiwam-portfolio-nine.vercel.app",
   "formspreeId": "xkjjlwvz",
@@ -23,14 +23,14 @@
   },
   "seo": {
     "title": "Shiwam Mishra · AI Engineer & Data Scientist",
-    "description": "Shiwam Mishra builds tested, deployed LLM and data applications. Projects, case studies and contact for AI Engineer and Data Scientist roles.",
+    "description": "Shiwam Mishra, Forward Deployed Engineer: AI agents, workflow automation and LLM integrations built around real business problems. Engineering case studies, profile and project inquiries.",
     "ogImage": "/og/default.png",
     "locale": "en_IN"
   },
   "nav": [
-    { "label": "Projects", "href": "/#projects" },
-    { "label": "Skills", "href": "/#skills" },
-    { "label": "Education", "href": "/#education" },
-    { "label": "About", "href": "/#about" }
+    { "label": "Case studies", "href": "/#case-studies" },
+    { "label": "How I work", "href": "/#how-i-work" },
+    { "label": "Profile", "href": "/#profile" },
+    { "label": "Work with me", "href": "/work-with-me/" }
   ]
 }

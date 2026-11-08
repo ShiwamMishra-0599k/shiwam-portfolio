@@ -64,7 +64,7 @@ test("page transitions: scripts keep working after navigating between pages", as
   test.skip(info.project.name !== "desktop", "desktop flow");
   await page.goto("/");
   await page
-    .locator("#projects")
+    .locator("#case-studies")
     .getByRole("link", { name: /Read the TabulaView\.ai case study/ })
     .click();
   await expect(page).toHaveURL(/\/projects\/tabulaview\/$/);
@@ -73,9 +73,9 @@ test("page transitions: scripts keep working after navigating between pages", as
   const related = page.locator("[data-reveal]").last();
   await related.scrollIntoViewIfNeeded();
   await expect(related).toHaveCSS("opacity", "1");
-  await page.goBack();
-  await expect(page).toHaveURL(/\/$/);
-  // Filters were re-initialised after the swap.
-  await page.getByRole("button", { name: "Data Analysis" }).click();
-  await expect(page.locator("[data-filter-status]")).toContainText("tagged Data Analysis");
+  // Client-side navigation to Work with me: the inquiry form script must initialise after the swap.
+  await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Work with me" }).click();
+  await expect(page).toHaveURL(/\/work-with-me\/$/);
+  await page.getByRole("button", { name: "Send project inquiry" }).click();
+  await expect(page.locator("[data-inquiry-form] [data-error-summary]")).toBeFocused();
 });

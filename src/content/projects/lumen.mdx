@@ -1,0 +1,198 @@
+---
+title: "A research agent that plans, calls eight live tools and streams its progress, instead of answering from memory"
+name: "Lumen"
+summary: "A full-stack research assistant: a React chat UI, a FastAPI backend with PostgreSQL, and a separate research agent that runs a Deep Agents ReAct loop over eight live data tools and streams each step back as it works."
+result: "Built and run locally with Docker Compose: 3 services, 14 API endpoints, 8 cached tools and 4 answer block types. No automated tests or evaluation yet."
+resultKind: "intended"
+overview:
+  problem: "Research questions need current facts from many places (the web, news, prices, maps). A chat model answering from memory goes stale, and a long silent wait gives the user no reason to trust the answer."
+  solution: "An agent that plans, calls live tools, caches what it fetched and streams a progress line for every tool call, then returns the answer as typed blocks (text, tables, maps, cards) saved with the conversation."
+  contribution: "Co-developed during my AI Engineer internship at Tipstat (Mar–Sep 2026). My resume work on it: the ReAct loop and its 8 tools with the 3-tier search fallback, the 14 endpoints across the 2 FastAPI services with event streaming, the Redis caching and the PostgreSQL models with JWT auth."
+  projectType: "Internship project at Tipstat, co-developed · shared with permission"
+  challenge: "Keeping a multi-step agent responsive and trustworthy: streaming every tool call, surviving search-provider failures, and ending every run with exactly one clear outcome."
+types: ["LLM/GenAI", "MLOps"]
+tech:
+  [
+    "Python",
+    "FastAPI",
+    "Deep Agents (LangGraph)",
+    "OpenRouter / OpenAI",
+    "PostgreSQL",
+    "Redis",
+    "React",
+    "TypeScript",
+    "Server-Sent Events",
+    "Docker Compose",
+  ]
+links:
+  github: "https://github.com/ShiwamMishra-0599k/deep-research-platform"
+order: 1
+related: ["tabulaview", "email-assistant"]
+sources:
+  - "deep-research-platform repo: README.md, docs/PROJECT_OVERVIEW.md, research-agent/ARCHITECTURE.md"
+  - "Code: research-agent agent/graph.py (model wiring, recursion limit), agent/tools.py (8 tools, fallbacks, cache expiries), http_handler.py (event stream), blocks/schemas.py (4 block types); backend routers (11 endpoints) + agent server (3 endpoints) = 14, counted 9 Nov 2026"
+  - "Contribution: Shiwam's resume (Oct 2026). Permission to show the project: Shiwam, 9 Nov 2026"
+  - "No tests folder and no evaluation in the repo (checked 9 Nov 2026)"
+updated: 2026-11-09
+---
+
+import LumenArchitecture from "../../components/case/LumenArchitecture.astro";
+
+## The problem
+
+Research questions are rarely one lookup. "What's the RBI's latest policy decision and how did the rupee react?" needs a news search, a page read and an exchange rate, all current. A chat model answering from its training data gets that wrong without saying so.
+
+There is a second, quieter problem: **waiting**. An agent that searches, reads and compares can take a while. If the screen shows only a spinner, the user can't tell whether it is working, stuck, or making things up.
+
+This is a general problem rather than one client's. The product was built during my internship for busy professionals in India, so the tools lean that way: Indian news feeds, rupee exchange rates, "nearest X" searches. The constraints were real: paid search APIs that can fail or run out of credit, external sites that are slow, and a frontend that had to keep up with whatever the agent decided to do.
+
+## The solution
+
+Lumen is three services:
+
+- **A React chat UI.** You ask a question and watch the agent's steps appear ("Searching the web for …", "Reading …"). The answer arrives as typed blocks: text, a data table, a map, or price cards.
+- **A FastAPI backend.** It handles accounts and conversations, keeps history in PostgreSQL and relays the agent's event stream to the browser.
+- **A research agent.** A separate FastAPI service running a Deep Agents ReAct loop on LangGraph. It plans, calls tools, reads results and decides what to do next.
+
+The agent has **eight tools**: web search, webpage and PDF reading, Wikipedia, nearby places, latest news, stock prices, exchange rates and crypto prices. Prices come from dedicated tools, never from scraping search snippets, so they render as cards with a timestamp.
+
+If a detail is missing, for example a city for "nearest pharmacy", the agent asks one short question instead of guessing.
+
+## System architecture
+
+<LumenArchitecture />
+
+A request moves through the system like this:
+
+1. The backend saves the user's message, loads the earlier messages and calls the agent with the question and history.
+2. The agent streams a **checkpoint** for every tool call, then **exactly one** terminal event (`blocks`, `clarification` or `error`), then `done`.
+3. The backend passes each event straight through to the browser.
+4. At the end, the backend saves the answer and its blocks to PostgreSQL in a fresh database session, because the request's own session has closed by then.
+
+## Engineering deep dive
+
+### 1. Search that doesn't fail when one provider does
+
+Search is the tool the agent uses most, and the paid providers can fail, throttle or run out of credit. `web_search` tries **Exa, then Tavily, then DuckDuckGo**, and only reports failure if all three fail. The excerpt below is from `agent/tools.py`, with the request details trimmed:
+
+```python
+async def _fetch() -> str:
+    # Try Exa first
+    if settings.EXA_API_KEY:
+        try:
+            ...  # Exa search_and_contents, 300-character snippets
+        except Exception as e:
+            logger.warning("Exa failed, trying Tavily: %s", e)
+
+    # Tavily fallback
+    if settings.TAVILY_API_KEY:
+        try:
+            ...  # POST https://api.tavily.com/search, 30 s timeout
+        except Exception as e:
+            logger.warning("Tavily failed, trying DuckDuckGo: %s", e)
+
+    # DuckDuckGo last resort
+    try:
+        ...
+    except Exception as e:
+        logger.error("All search providers failed: %s", e)
+        return f"Search failed: {e}"
+```
+
+**Why this approach:** each provider is optional. A missing key just skips that step, so the system runs on a free tier (DuckDuckGo alone) and gets better when keys are added. Page reading works the same way: Jina Reader first, then PyMuPDF for PDFs.
+
+**The trade-off:** the fallback order is fixed. A slow first provider still costs its full timeout before the next one is tried.
+
+### 2. Caching with an expiry per kind of data
+
+Every tool goes through one helper. The cache key is the tool name plus a hash of its input:
+
+```python
+async def _cached(key: str, ttl: int, coro_factory) -> str:
+    cached = await cache_get(key)
+    if cached:
+        logger.debug("Cache hit: %s", key)
+        return cached
+    result = await coro_factory()
+    await cache_set(key, result, ttl)
+    return result
+```
+
+**How long each result is kept depends on how fast it goes stale:**
+
+| Tool                       | Kept for |
+| -------------------------- | -------- |
+| Crypto prices              | 5 min    |
+| News, stock prices         | 15 min   |
+| Web search, exchange rates | 1 h      |
+| Web pages                  | 6 h      |
+| Wikipedia, places          | 24 h     |
+
+**If Redis is down,** `cache_get` and `cache_set` catch the error and treat it as a miss. A cache outage makes Lumen slower, but it never stops a research run.
+
+### 3. A stream the UI can rely on
+
+The UI has to know when a run is over and how it ended. `http_handler.stream_research` guarantees that every stream ends with **exactly one** terminal event, then `done`:
+
+- **`clarification`:** the model's answer starts with `[CLARIFICATION]`.
+- **`error`:** the agent can't start, the loop throws, or formatting fails.
+- **`blocks`:** everything else.
+
+Follow-up suggestions are optional. They get a 3-second timeout, and if they're late the answer goes out without them:
+
+```python
+follow_ups = await asyncio.wait_for(
+    generate_follow_ups(req.query, final_text, tool_names),
+    timeout=3.0,
+)
+```
+
+On the frontend, `BlockRenderer` picks a component by `template_id`. **An unknown block type falls back to a JSON viewer,** so a new block type on the server can never break the UI.
+
+## Production engineering
+
+**Implemented (in the code):**
+
+- **Fallback chains:** search goes Exa → Tavily → DuckDuckGo, and page reading goes Jina Reader → PyMuPDF.
+- **Redis caching** with a separate expiry per tool. If the cache fails, the run continues without it.
+- **Timeouts and limits:** 10–30 s timeouts on its direct HTTP calls, a recursion limit of 50 on the agent loop, and a 3-second cap on follow-up suggestions.
+- **A stream contract:** every run ends with exactly one terminal event, and the backend notices when the browser disconnects mid-stream.
+- **Health check:** `/health/ready` reports a missing model API key.
+- **Security basics:** bcrypt passwords, JWT auth on every conversation route, and CORS limited to configured origins.
+- **Lower model cost:** prompt caching on the system prompt through OpenRouter.
+
+**Not implemented yet (honest gaps):**
+
+- **No automated tests and no evaluation set.** pytest is configured, but the tests folder doesn't exist.
+- **The OpenAI "fallback" is chosen at startup, not during a run.** If OpenRouter fails mid-research, the run errors instead of switching models.
+- **Raw exception text reaches the user** in `error` events. It should be a safe message, with the detail kept in the logs.
+- **No rate limiting, no structured logs or tracing,** and no deployment beyond Docker Compose on one machine.
+- **The token handling is a convenience, not production-grade:** the JWT is kept in `localStorage` and can be passed as a query parameter for event streams.
+
+## Business applications and impact
+
+**No measured outcome yet.** Lumen ran locally during the internship. It has no users or time-saved figures I can show, so this section describes what it is for, not results.
+
+**Where this pattern applies:**
+
+- **Competitive and market research:** search, read and compare sources, and cite the URLs.
+- **Monitoring:** current news, prices and exchange rates, refreshed by expiry rather than re-fetched on every question.
+- **Internal knowledge research:** the same loop with internal tools in place of public ones.
+
+**What it would take to deliver value at a company:**
+
+1. Agree with users what a "good answer" is.
+2. Build a small question set and score answers against it.
+3. Add the internal tools the team needs.
+4. Measure the time saved against the current manual process.
+
+## Reflection and next steps
+
+What I learned: in an agent product, **the stream is the product**. A visible step for every tool call, one guaranteed ending and a UI that tolerates unknown blocks did more for trust than a better prompt.
+
+What I would do next, in order:
+
+1. **An evaluation set:** 30–50 real questions with expected sources, scored on correctness and citations before any prompt or model change.
+2. **Tests** for the tool fallbacks, the cache key logic and the stream contract.
+3. **Runtime model failover** and safe user-facing error messages.
+4. **For a company deployment:** cookie-based auth, rate limits, structured logs and tracing, and per-tenant tool permissions.

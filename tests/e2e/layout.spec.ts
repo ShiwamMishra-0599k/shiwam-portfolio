@@ -3,7 +3,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { revealAll } from "./helpers";
 import { existsSync } from "node:fs";
 
-const pages = ["/", "/404"];
+const pages = ["/", "/404", "/work-with-me/"];
 
 for (const path of pages) {
   test(`${path}: no axe violations (WCAG 2.2 AA)`, async ({ page }) => {
@@ -55,7 +55,7 @@ test("desktop nav links and contact button reach their sections", async ({ page 
   test.skip(info.project.name !== "desktop", "desktop nav only");
   await page.goto("/");
   const nav = page.getByRole("navigation", { name: "Main" });
-  for (const name of ["Projects", "Skills", "Education", "About"]) {
+  for (const name of ["Case studies", "How I work", "Profile", "Work with me"]) {
     await expect(nav.getByRole("link", { name, exact: true })).toBeVisible();
   }
   await nav.getByRole("link", { name: "Contact" }).click();
@@ -73,21 +73,25 @@ test("mobile menu: toggles, announces state, Escape closes and returns focus", a
   await expect(close).toHaveAttribute("aria-expanded", "true");
   const menu = page.locator("#mobile-menu");
   await expect(menu).toBeVisible();
-  await expect(menu.getByRole("link", { name: "Projects" })).toBeFocused();
+  await expect(menu.getByRole("link", { name: "Case studies" })).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(menu).toBeHidden();
   await expect(page.getByRole("button", { name: "Open menu" })).toBeFocused();
   // Selecting a link closes the menu.
   await page.getByRole("button", { name: "Open menu" }).click();
-  await menu.getByRole("link", { name: "Skills" }).click();
+  await menu.getByRole("link", { name: "How I work" }).click();
   await expect(menu).toBeHidden();
-  await expect(page).toHaveURL(/#skills$/);
+  await expect(page).toHaveURL(/#how-i-work$/);
 });
 
 test("footer repeats the contact call to action", async ({ page }) => {
   await page.goto("/");
   const footer = page.getByRole("contentinfo");
   await expect(footer.getByRole("link", { name: "Get in touch" })).toHaveAttribute("href", "/#contact");
+  await expect(footer.getByRole("link", { name: "Start a project inquiry" })).toHaveAttribute(
+    "href",
+    "/work-with-me/#inquiry",
+  );
   await expect(footer.getByRole("link", { name: "Email" })).toHaveAttribute("href", "mailto:shiwammishrayt@gmail.com");
 });
 

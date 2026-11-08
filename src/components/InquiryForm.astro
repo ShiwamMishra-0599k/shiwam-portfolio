@@ -1,0 +1,344 @@
+---
+/**
+ * Project inquiry form. Posts to the same Formspree form as Contact (subject "Project inquiry").
+ * Shows success only after Formspree answers OK; any failure shows an error with the email fallback.
+ */
+import { site } from "../lib/site";
+import { formspreeEndpoint, SOLUTION_TYPES, TIMELINES, BUDGETS, INQUIRY_LIMITS, LIMITS } from "../lib/contact";
+
+const endpoint = formspreeEndpoint(import.meta.env.PUBLIC_FORMSPREE_ID || site.formspreeId);
+const field =
+  "mt-2 block w-full rounded-lg border-2 border-forest bg-cream-soft px-4 py-3 text-base text-forest placeholder:text-forest-muted aria-[invalid=true]:border-pink aria-[invalid=true]:shadow-[0_0_0_3px_var(--color-pink)] focus-visible:shadow-[0_0_0_6px_var(--color-pink)]";
+const opt = "optional";
+---
+
+{endpoint ? (
+  <div>
+    <form action={endpoint} method="POST" novalidate class="space-y-6" data-inquiry-form>
+      <p class="text-sm">Fields marked “optional” can be left empty.</p>
+
+      <div
+        role="alert"
+        class="hidden rounded-lg border-2 border-forest bg-cream-soft p-4"
+        data-error-summary
+        tabindex="-1"
+      >
+        <p class="font-semibold">
+          <span aria-hidden="true" class="mr-2 inline-block h-2.5 w-2.5 rounded-full bg-pink" />
+          Please fix the following:
+        </p>
+        <ul class="mt-2 list-disc pl-6" data-error-list />
+      </div>
+
+      <div class="grid gap-6 sm:grid-cols-2">
+        <div>
+          <label for="inq-name" class="font-semibold">
+            Name
+          </label>
+          <input
+            id="inq-name"
+            name="name"
+            type="text"
+            autocomplete="name"
+            required
+            maxlength={LIMITS.name.max}
+            aria-describedby="inq-name-error"
+            class={field}
+          />
+          <p id="inq-name-error" class="mt-2 hidden text-sm font-semibold" data-error-for="name" />
+        </div>
+        <div>
+          <label for="inq-email" class="font-semibold">
+            Business email
+          </label>
+          <input
+            id="inq-email"
+            name="email"
+            type="email"
+            inputmode="email"
+            autocomplete="email"
+            required
+            maxlength={LIMITS.email.max}
+            aria-describedby="inq-email-error"
+            class={field}
+          />
+          <p id="inq-email-error" class="mt-2 hidden text-sm font-semibold" data-error-for="email" />
+        </div>
+        <div>
+          <label for="inq-company" class="font-semibold">
+            Company
+          </label>
+          <input
+            id="inq-company"
+            name="company"
+            type="text"
+            autocomplete="organization"
+            required
+            maxlength={INQUIRY_LIMITS.company.max}
+            aria-describedby="inq-company-error"
+            class={field}
+          />
+          <p id="inq-company-error" class="mt-2 hidden text-sm font-semibold" data-error-for="company" />
+        </div>
+        <div>
+          <label for="inq-website" class="font-semibold">
+            Website <span class="font-normal">({opt})</span>
+          </label>
+          <input
+            id="inq-website"
+            name="website"
+            type="text"
+            inputmode="url"
+            autocomplete="url"
+            placeholder="acme.com"
+            maxlength={INQUIRY_LIMITS.website.max}
+            aria-describedby="inq-website-error"
+            class={field}
+          />
+          <p id="inq-website-error" class="mt-2 hidden text-sm font-semibold" data-error-for="website" />
+        </div>
+      </div>
+
+      <div>
+        <label for="inq-problem" class="font-semibold">
+          What problem are you trying to solve?
+        </label>
+        <textarea
+          id="inq-problem"
+          name="problem"
+          rows="5"
+          required
+          maxlength={INQUIRY_LIMITS.problem.max}
+          aria-describedby="inq-problem-hint inq-problem-error"
+          class={field}
+        />
+        <p id="inq-problem-hint" class="mt-2 text-sm">
+          What happens today, who does it, and where time is lost. At least {INQUIRY_LIMITS.problem.min} characters.
+        </p>
+        <p id="inq-problem-error" class="mt-2 hidden text-sm font-semibold" data-error-for="problem" />
+      </div>
+
+      <div class="grid gap-6 sm:grid-cols-2">
+        <div>
+          <label for="inq-solutionType" class="font-semibold">
+            Type of solution
+          </label>
+          <select
+            id="inq-solutionType"
+            name="solutionType"
+            required
+            aria-describedby="inq-solutionType-error"
+            class={field}
+          >
+            <option value="">Choose one</option>
+            {SOLUTION_TYPES.map((t) => (
+              <option value={t}>{t}</option>
+            ))}
+          </select>
+          <p id="inq-solutionType-error" class="mt-2 hidden text-sm font-semibold" data-error-for="solutionType" />
+        </div>
+        <div>
+          <label for="inq-timeline" class="font-semibold">
+            Expected timeline
+          </label>
+          <select id="inq-timeline" name="timeline" required aria-describedby="inq-timeline-error" class={field}>
+            <option value="">Choose one</option>
+            {TIMELINES.map((t) => (
+              <option value={t}>{t}</option>
+            ))}
+          </select>
+          <p id="inq-timeline-error" class="mt-2 hidden text-sm font-semibold" data-error-for="timeline" />
+        </div>
+        <div>
+          <label for="inq-tools" class="font-semibold">
+            Existing software or tools <span class="font-normal">({opt})</span>
+          </label>
+          <input
+            id="inq-tools"
+            name="tools"
+            type="text"
+            placeholder="e.g. Gmail, Google Sheets, Zoho"
+            maxlength={INQUIRY_LIMITS.tools.max}
+            aria-describedby="inq-tools-error"
+            class={field}
+          />
+          <p id="inq-tools-error" class="mt-2 hidden text-sm font-semibold" data-error-for="tools" />
+        </div>
+        <div>
+          <label for="inq-budget" class="font-semibold">
+            Project budget <span class="font-normal">({opt})</span>
+          </label>
+          <select id="inq-budget" name="budget" aria-describedby="inq-budget-error" class={field}>
+            <option value="">Prefer not to say</option>
+            {BUDGETS.map((b) => (
+              <option value={b}>{b}</option>
+            ))}
+          </select>
+          <p id="inq-budget-error" class="mt-2 hidden text-sm font-semibold" data-error-for="budget" />
+        </div>
+      </div>
+
+      <div class="hidden" aria-hidden="true">
+        <label for="inq-gotcha">Leave this field empty</label>
+        <input id="inq-gotcha" type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
+      </div>
+      <input type="hidden" name="_subject" value={`Project inquiry for ${site.name}`} />
+      <input type="hidden" name="formType" value="project-inquiry" />
+
+      <div class="flex flex-wrap items-center gap-4">
+        <button type="submit" class="btn-primary disabled:cursor-wait disabled:opacity-70" data-submit>
+          <span data-submit-label>Send project inquiry</span>
+        </button>
+        <p class="text-sm" aria-live="polite" data-sending />
+      </div>
+
+      <div
+        role="alert"
+        class="hidden rounded-lg border-2 border-forest bg-cream-soft p-4"
+        data-send-error
+        tabindex="-1"
+      >
+        <p class="font-semibold">
+          <span aria-hidden="true" class="mr-2 inline-block h-2.5 w-2.5 rounded-full bg-pink" />
+          Your inquiry couldn't be sent.
+        </p>
+        <p class="mt-1">
+          Nothing was lost: your answers are still in the form. Please try again, or email me at{" "}
+          <a class="underline decoration-pink decoration-2 underline-offset-2" href={`mailto:${site.links.email}`}>
+            {site.links.email}
+          </a>
+          .
+        </p>
+      </div>
+    </form>
+
+    <div
+      class="hidden rounded-2xl border-2 border-forest bg-cream-soft p-6"
+      role="status"
+      tabindex="-1"
+      data-inquiry-success
+    >
+      <p class="font-display text-h3 font-semibold">
+        <span aria-hidden="true" class="mr-2 inline-block h-3 w-3 rounded-full bg-pink" />
+        Thanks, your inquiry has been sent.
+      </p>
+      <p class="mt-2">Any reply will go to the email address you entered.</p>
+    </div>
+  </div>
+) : (
+  <p class="text-lead">
+    Please email your project details to{" "}
+    <a class="underline decoration-pink decoration-2 underline-offset-4" href={`mailto:${site.links.email}`}>
+      {site.links.email}
+    </a>
+  </p>
+)}
+
+<script>
+  import { validateInquiry, type InquiryField, type InquiryInput } from "../lib/contact";
+
+  const FIELDS: InquiryField[] = [
+    "name",
+    "email",
+    "company",
+    "website",
+    "problem",
+    "solutionType",
+    "tools",
+    "budget",
+    "timeline",
+  ];
+
+  function initInquiry() {
+    const form = document.querySelector<HTMLFormElement>("[data-inquiry-form]");
+    if (!form || form.dataset.ready) return;
+    form.dataset.ready = "true";
+    const success = document.querySelector<HTMLElement>("[data-inquiry-success]");
+    const summary = form.querySelector<HTMLElement>("[data-error-summary]")!;
+    const summaryList = form.querySelector<HTMLElement>("[data-error-list]")!;
+    const sendError = form.querySelector<HTMLElement>("[data-send-error]")!;
+    const button = form.querySelector<HTMLButtonElement>("[data-submit]")!;
+    const label = form.querySelector<HTMLElement>("[data-submit-label]")!;
+    const sending = form.querySelector<HTMLElement>("[data-sending]")!;
+    const el = (f: InquiryField) =>
+      form.elements.namedItem(f) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+    let touched = false;
+
+    const values = () => Object.fromEntries(FIELDS.map((f) => [f, el(f).value])) as InquiryInput;
+
+    const show = (showSummary: boolean) => {
+      const errors = validateInquiry(values());
+      for (const f of FIELDS) {
+        const msg = form.querySelector<HTMLElement>(`[data-error-for="${f}"]`)!;
+        const err = errors[f];
+        el(f).setAttribute("aria-invalid", String(Boolean(err)));
+        msg.textContent = err ? `Error: ${err}` : "";
+        msg.classList.toggle("hidden", !err);
+      }
+      const list = FIELDS.filter((f) => errors[f]);
+      summaryList.replaceChildren(
+        ...list.map((f) => {
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          a.href = `#inq-${f}`;
+          a.className = "underline decoration-pink decoration-2 underline-offset-2";
+          a.textContent = errors[f]!;
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            el(f).focus();
+          });
+          li.append(a);
+          return li;
+        }),
+      );
+      summary.classList.toggle("hidden", !(showSummary && list.length));
+      return list;
+    };
+
+    for (const f of FIELDS) {
+      el(f).addEventListener("blur", () => {
+        if (touched || el(f).value) show(false);
+      });
+      el(f).addEventListener("input", () => {
+        if (el(f).getAttribute("aria-invalid") === "true") show(false);
+      });
+    }
+
+    const setBusy = (busy: boolean) => {
+      button.disabled = busy;
+      label.textContent = busy ? "Sending…" : "Send project inquiry";
+      sending.textContent = busy ? "Sending your inquiry…" : "";
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      touched = true;
+      sendError.classList.add("hidden");
+      if (show(true).length) {
+        summary.focus();
+        return;
+      }
+      setBusy(true);
+      try {
+        const res = await fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { Accept: "application/json" },
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        form.reset();
+        form.classList.add("hidden");
+        success?.classList.remove("hidden");
+        success?.focus();
+      } catch {
+        sendError.classList.remove("hidden");
+        sendError.focus();
+      } finally {
+        setBusy(false);
+      }
+    });
+  }
+
+  initInquiry();
+  document.addEventListener("astro:after-swap", initInquiry);
+</script>

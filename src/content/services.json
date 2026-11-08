@@ -1,0 +1,85 @@
+{
+  "_note": "Work with me page. These are offers, not completed client engagements: each names the closest real work on the site. No prices, clients or outcomes are claimed.",
+  "hero": {
+    "eyebrow": "Work with me",
+    "title": "From business bottlenecks to intelligent automation.",
+    "intro": "I help businesses turn repetitive processes, fragmented systems and operational inefficiencies into practical AI-powered workflows, scoped around a defined deliverable rather than open-ended hours.",
+    "honesty": "I haven't delivered a paid client project yet. What I can show is the engineering: the case studies on this site, with their architecture, tests and limits written down.",
+    "cta": { "label": "Tell me about your workflow", "href": "#inquiry" }
+  },
+  "services": [
+    {
+      "title": "AI workflow automation",
+      "problem": "Routine items (emails, requests, forms, reports) are read, sorted and answered by hand.",
+      "solution": "An LLM pipeline that classifies, summarises and drafts, with clear rules for what a person must still approve.",
+      "example": "New enquiry arrives → labelled by urgency and intent → draft reply prepared → urgent items routed to a person.",
+      "benefit": "Fewer hours on routine handling; urgent items still reviewed by a person.",
+      "includes": ["Workflow mapping", "Pipeline build and integration", "Approval rules", "Hand-over notes"],
+      "evidence": { "label": "AI Email Assistant", "href": "/projects/email-assistant/" }
+    },
+    {
+      "title": "RAG and knowledge systems",
+      "problem": "Answers are spread across documents, past messages and websites, and people search by hand.",
+      "solution": "Retrieval that puts the relevant sources in front of the model, with citations people can check.",
+      "example": "Question → search and retrieve sources → answer with links → saved to the conversation.",
+      "benefit": "Faster answers that can be checked against their sources.",
+      "includes": [
+        "Source inventory",
+        "Retrieval pipeline",
+        "Answer format with citations",
+        "A small test question set"
+      ],
+      "evidence": { "label": "Lumen", "href": "/projects/lumen/" }
+    },
+    {
+      "title": "Custom AI agents",
+      "problem": "Research, comparison and monitoring tasks need several tools and steps, not one prompt.",
+      "solution": "An agent with typed tools, caching, provider fallbacks and visible progress.",
+      "example": "Research request → agent plans → calls search, reader and data tools → returns a structured answer.",
+      "benefit": "Multi-step lookups done in minutes, with the working shown.",
+      "includes": ["Tool design", "Agent loop and guardrails", "Streaming UI or API", "Failure handling"],
+      "evidence": { "label": "Lumen", "href": "/projects/lumen/" }
+    },
+    {
+      "title": "Data and system integration",
+      "problem": "Data lives in spreadsheets and disconnected tools, in inconsistent formats.",
+      "solution": "Pipelines and APIs that clean, validate and connect the data, flagging bad records instead of hiding them.",
+      "example": "Monthly spreadsheet export → parsed and profiled → quality issues flagged → KPIs computed → report.",
+      "benefit": "One trusted view of the numbers and a clear list of data problems.",
+      "includes": ["Data audit", "Ingestion and validation", "API or dashboard", "Tests on the calculations"],
+      "evidence": { "label": "TabulaView.ai", "href": "/projects/tabulaview/" }
+    },
+    {
+      "title": "AI technical discovery and architecture",
+      "problem": "You think AI could help but don't know where, what it would cost, or what could go wrong.",
+      "solution": "A short assessment of the workflow, the data and the options, ending in a written architecture and plan.",
+      "example": "Walk through the workflow → identify the bottleneck → compare approaches → architecture and roadmap.",
+      "benefit": "A clear yes, no or not-yet before any money goes into building.",
+      "includes": ["Workflow review", "Feasibility and risks", "Architecture diagram", "Implementation roadmap"],
+      "evidence": { "label": "How I work", "href": "/#how-i-work" }
+    }
+  ],
+  "why": {
+    "title": "Why work with me",
+    "items": [
+      { "title": "Business problem first", "text": "I start from where time is lost, not from a favourite tool." },
+      {
+        "title": "AI and backend together",
+        "text": "Agents, LLM APIs, FastAPI services, databases and the UI that uses them."
+      },
+      {
+        "title": "Pragmatic architecture",
+        "text": "The simplest design that fits your constraints, with the trade-offs written down."
+      },
+      { "title": "End to end", "text": "From the first workflow map to a deployed, tested system." },
+      {
+        "title": "Built to fail safely",
+        "text": "Fallbacks, timeouts and checks, so one bad API call doesn't stop the work."
+      },
+      {
+        "title": "Plain-language communication",
+        "text": "Clear notes for whoever runs the system after me, technical or not."
+      }
+    ]
+  }
+}

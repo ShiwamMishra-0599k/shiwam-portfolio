@@ -1,0 +1,73 @@
+---
+import Section from "./Section.astro";
+import fde from "../content/fde.json";
+import { site, hasResume } from "../lib/site";
+
+const { profile } = fde;
+---
+
+<Section id="profile" tone="dark" index={5} eyebrow={profile.eyebrow} title={profile.title}>
+  <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_16rem] lg:gap-16">
+    <div>
+      <p class="max-w-(--container-prose) text-lead" data-reveal>
+        {profile.summary}
+      </p>
+
+      <h3 class="mt-14 font-mono text-sm font-semibold tracking-[0.14em] text-cream-muted uppercase">Experience</h3>
+      <ol class="mt-6 space-y-10 border-l-2 border-line-dark pl-6">
+        {profile.experience.map((job) => (
+          <li class="relative" data-reveal>
+            <span class="absolute top-2 -left-[31px] h-3 w-3 rounded-full bg-pink" aria-hidden="true"></span>
+            <p class="font-mono text-sm text-cream-muted">{job.dates}</p>
+            <h4 class="mt-1 font-display text-h3 font-semibold">
+              {job.role}, {job.org}
+            </h4>
+            {job.place && <p class="text-sm text-cream-muted">{job.place}</p>}
+            <ul class="mt-4 max-w-(--container-prose) list-disc space-y-2 pl-5 text-base">
+              {job.points.map((pt) => (
+                <li>{pt}</li>
+              ))}
+            </ul>
+            {job.link && (
+              <p class="mt-4">
+                <a href={job.link.href} class="link-underline font-semibold">
+                  {job.link.label}
+                </a>
+              </p>
+            )}
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    <aside aria-label="Resume and profiles" class="lg:pt-2">
+      {hasResume && (
+        <a href={site.resume.path} class="btn-primary w-full justify-center" download="Shiwam_Mishra_Resume.pdf">
+          Download resume <span class="sr-only">(PDF)</span>
+        </a>
+      )}
+      <ul class="mt-6 space-y-3 text-base">
+        <li>
+          <a class="link-underline font-semibold" href={site.links.linkedin} rel="me noopener">
+            LinkedIn <span aria-hidden="true">↗</span>
+          </a>
+        </li>
+        <li>
+          <a class="link-underline font-semibold" href={site.links.github} rel="me noopener">
+            GitHub <span aria-hidden="true">↗</span>
+          </a>
+        </li>
+        <li>
+          <a class="link-underline font-semibold" href="#skills">
+            Technical skills
+          </a>
+        </li>
+        <li>
+          <a class="link-underline font-semibold" href="#education">
+            Education & certifications
+          </a>
+        </li>
+      </ul>
+    </aside>
+  </div>
+</Section>

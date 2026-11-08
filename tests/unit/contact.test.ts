@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { LIMITS, formspreeEndpoint, validateContact } from "../../src/lib/contact";
+import {
+  LIMITS,
+  formspreeEndpoint,
+  validateContact,
+  validateInquiry,
+  INQUIRY_LIMITS,
+  BUDGETS,
+} from "../../src/lib/contact";
 
 const ok = {
   name: "Asha Rao",
@@ -45,5 +52,48 @@ describe("formspreeEndpoint", () => {
   });
   it.each([undefined, "", "abc", "has space1", "../evil", "https://x"])("returns null for %s", (id) => {
     expect(formspreeEndpoint(id)).toBeNull();
+  });
+});
+
+describe("validateInquiry", () => {
+  const ok = {
+    name: "Asha Rao",
+    email: "asha@acme.in",
+    company: "Acme Clinics",
+    website: "",
+    problem: "We copy patient enquiries from email into a spreadsheet by hand every morning.",
+    solutionType: "AI workflow automation",
+    tools: "Gmail, Google Sheets",
+    budget: "",
+    timeline: "Within a month",
+  };
+  it("accepts a complete inquiry with optional fields empty", () => {
+    expect(validateInquiry(ok)).toEqual({});
+  });
+  it("requires the core fields", () => {
+    const e = validateInquiry({
+      ...ok,
+      name: "",
+      email: "x",
+      company: " ",
+      problem: "short",
+      solutionType: "",
+      timeline: "",
+    });
+    expect(Object.keys(e).sort()).toEqual(["company", "email", "name", "problem", "solutionType", "timeline"]);
+  });
+  it("checks the website only when given", () => {
+    expect(validateInquiry({ ...ok, website: "acme.in" })).toEqual({});
+    expect(validateInquiry({ ...ok, website: "https://www.acme.com/about" })).toEqual({});
+    expect(validateInquiry({ ...ok, website: "not a site" }).website).toBeDefined();
+  });
+  it("only accepts listed options", () => {
+    expect(validateInquiry({ ...ok, solutionType: "Blockchain" }).solutionType).toBeDefined();
+    expect(validateInquiry({ ...ok, budget: "₹1" }).budget).toBeDefined();
+    expect(validateInquiry({ ...ok, budget: BUDGETS[1] })).toEqual({});
+  });
+  it("enforces the problem length limits", () => {
+    expect(validateInquiry({ ...ok, problem: "x".repeat(INQUIRY_LIMITS.problem.min) })).toEqual({});
+    expect(validateInquiry({ ...ok, problem: "x".repeat(INQUIRY_LIMITS.problem.max + 1) }).problem).toBeDefined();
   });
 });

@@ -1,39 +1,35 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Section from "../components/Section.astro";
 import Hero from "../components/Hero.astro";
-import About from "../components/About.astro";
-import ProjectsGrid from "../components/ProjectsGrid.astro";
+import WhatIDo from "../components/WhatIDo.astro";
+import CaseStudies from "../components/CaseStudies.astro";
+import HowIWork from "../components/HowIWork.astro";
+import SupportingProjects from "../components/SupportingProjects.astro";
+import Profile from "../components/Profile.astro";
 import Skills from "../components/Skills.astro";
 import Education from "../components/Education.astro";
+import About from "../components/About.astro";
+import DualCta from "../components/DualCta.astro";
 import Contact from "../components/Contact.astro";
 import { getProjects } from "../lib/projects";
 import { personJsonLd, websiteJsonLd } from "../lib/seo";
 
-const projects = await getProjects();
+// Featured: the two primary case studies (lowest `order`). The rest appear under "More projects".
+const featured = (await getProjects()).slice(0, 2);
 
 // All content comes from src/content (see CLAUDE.md). No invented content.
 ---
 
 <BaseLayout jsonLd={[personJsonLd(), websiteJsonLd()]}>
   <Hero />
-
-  <Section
-    id="projects"
-    tone="dark"
-    index={1}
-    eyebrow="Projects"
-    title="Featured projects"
-    intro="Each project links to its code and a case study: the problem, the data, the decisions, how it was evaluated, and what it still can't do."
-  >
-    <ProjectsGrid projects={projects} />
-  </Section>
-
+  <WhatIDo />
+  <CaseStudies projects={featured} />
+  <HowIWork />
+  <SupportingProjects />
+  <Profile />
   <Skills />
-
   <Education />
-
   <About />
-
+  <DualCta />
   <Contact />
 </BaseLayout>

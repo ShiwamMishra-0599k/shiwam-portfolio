@@ -8,6 +8,8 @@ import sitemap from "@astrojs/sitemap";
 export default defineConfig({
   site: "https://shiwam-portfolio-nine.vercel.app",
   trailingSlash: "ignore", // canonical URLs and the sitemap both use a trailing slash
+  // Code blocks are styled in global.css with brand colours; no syntax theme (its colours failed contrast).
+  markdown: { syntaxHighlight: false },
   prefetch: { prefetchAll: false, defaultStrategy: "hover" },
   vite: {
     plugins: [tailwindcss()],

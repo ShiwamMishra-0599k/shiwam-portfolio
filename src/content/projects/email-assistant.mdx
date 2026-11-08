@@ -2,12 +2,19 @@
 title: "An inbox assistant that summarises, classifies and drafts replies with Gemini"
 name: "AI Email Assistant"
 summary: "A FastAPI service that reads the latest Gmail messages, runs four Gemini tasks on each (sentiment, summary, classification, draft reply) and stores them in ChromaDB, reusing the closest past reply as a tone example."
+resultKind: "intended"
+overview:
+  problem: "A busy inbox mixes mail that needs a reply today with newsletters and notifications. Sorting and answering routine mail by hand takes time, and replies drift in tone."
+  solution: "A FastAPI service that summarises, labels (urgency, intent, topic) and drafts a reply for each new email, reusing the closest past reply as a tone example, and leaves urgent mail to a person."
+  contribution: "Built it myself: Gmail integration, the four Gemini tasks, the ChromaDB memory, the guardrail and the API."
+  projectType: "Personal project · runs locally"
+  challenge: "Getting dependable structured labels out of an LLM and keeping a person in charge of anything urgent."
 result: "Works end to end against Gmail: 4 Gemini tasks per email and 3 API endpoints. Ships with fictional sample data, so anyone can run the storage and search without a Gmail account."
 types: ["LLM/GenAI"]
 tech: ["Python", "FastAPI", "Gmail API", "Gemini 2.5 Flash", "ChromaDB", "Sentence Transformers", "better-profanity"]
 links:
   github: "https://github.com/ShiwamMishra-0599k/Email-management"
-order: 2
+order: 3
 related: ["tabulaview"]
 sources:
   - "Repo code: main.py (endpoints, auto-reply rule, 5-email fetch via extract_emails.py), call_gemini.py (model and prompts), similarity_search.py (top-1 retrieval)"
@@ -18,7 +25,7 @@ updated: 2026-11-08
 
 import EmailAssistantPipeline from "../../components/case/EmailAssistantPipeline.astro";
 
-## Problem and why it matters
+## The problem
 
 A busy inbox mixes things that need a reply today with newsletters and notifications. Reading, sorting and answering routine mail by hand takes time, and replies drift in tone.
 
@@ -29,7 +36,7 @@ I wanted an assistant that could:
 - draft a reply in a consistent tone;
 - leave the final decision to a person.
 
-## Data
+### The data it handles
 
 - **Live input:** the 5 latest messages in a Gmail inbox, fetched through the Gmail API with OAuth.
 - **What's stored:** each processed email, with its labels and draft reply, in a local ChromaDB store. Login files (`credentials.json`, `token.json`), the `.env` file and the local store are all excluded from git.
@@ -39,9 +46,7 @@ I wanted an assistant that could:
   - empty bodies;
   - getting reliable JSON out of the model for classification.
 
-## Approach and architecture
-
-<EmailAssistantPipeline />
+## The solution
 
 1. **Fetch** the 5 latest inbox messages.
 2. **Guardrail:** flag profanity before anything is generated.
@@ -49,7 +54,13 @@ I wanted an assistant that could:
 4. **Memory:** embed the email (all-MiniLM-L6-v2), store it in ChromaDB, and retrieve the most similar past email. Its reply goes into the prompt as a tone and structure example.
 5. **Decide:** an email is flagged for auto-reply only if it is not urgent and not FYI. Urgent mail is left for a person.
 
-## Models, tools and key decisions
+## System architecture
+
+<EmailAssistantPipeline />
+
+## Engineering deep dive
+
+### Key decisions and trade-offs
 
 | Decision              | What I chose                                                                  | What I rejected, and why                                                                   |
 | --------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
@@ -61,7 +72,11 @@ I wanted an assistant that could:
 | Use of retrieval      | The closest past reply, as a _tone example_                                   | Treating retrieval as a fact source. The project doesn't ground facts and doesn't claim to |
 | Safety                | Profanity flag and the "urgent or FYI → no auto-reply" rule                   | Fully automatic sending                                                                    |
 
-## Evaluation
+## Production engineering
+
+**Human in the loop:** urgent and FYI mail is never auto-replied; a person decides. Profanity is flagged before anything is generated.
+
+### What was tested
 
 **There's no formal evaluation yet,** and I don't claim accuracy numbers.
 
@@ -78,7 +93,14 @@ What I'd measure next:
 - Classification accuracy against a hand-labelled set of fictional emails.
 - How often a person would send a draft without editing it.
 
-## Results
+### Deployment
+
+- Runs locally with `uvicorn`. It isn't hosted, because it needs each user's own Gmail OAuth login.
+- Secrets live only in `.env`, which git ignores. The repo includes a `.env.example`.
+
+## Business applications and impact
+
+**Built and verified:**
 
 - A working FastAPI service with **3 endpoints**:
   - process the latest emails;
@@ -87,12 +109,9 @@ What I'd measure next:
 - **4 Gemini tasks** per email, with classification returned as structured JSON.
 - A public repo that **anyone can run safely**, with fictional sample data and no secrets or personal data committed.
 
-## Deployment
+**Where it applies:** support, sales and operations inboxes where much of the mail is routine. No time-saved figures yet: the next step would be measuring how often a person sends a draft without editing it.
 
-- Runs locally with `uvicorn`. It isn't hosted, because it needs each user's own Gmail OAuth login.
-- Secrets live only in `.env`, which git ignores. The repo includes a `.env.example`.
-
-## Limitations and what I'd do next
+## Reflection and next steps
 
 - Synchronous and single-user. Each call processes 5 emails, one after another.
 - Sentiment is stored but not yet used for routing.

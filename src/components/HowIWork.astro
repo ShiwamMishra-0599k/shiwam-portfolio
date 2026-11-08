@@ -1,0 +1,33 @@
+---
+import Section from "./Section.astro";
+import fde from "../content/fde.json";
+
+const { process } = fde;
+---
+
+<Section id="how-i-work" index={3} eyebrow={process.eyebrow} title={process.title}>
+  <ol class="border-t-2 border-forest">
+    {process.steps.map((s, i) => (
+      <li
+        class="grid gap-4 border-b border-line py-8 md:grid-cols-[11rem_minmax(0,1fr)_minmax(0,1fr)] md:gap-10"
+        data-reveal
+        style={`--reveal-delay:${i * 60}ms`}
+      >
+        <h3 class="flex items-baseline gap-3 text-h3">
+          <span class="font-mono text-base font-semibold text-forest-muted" aria-hidden="true">
+            {s.n}
+          </span>
+          <span>
+            <span class="sr-only">Step {Number(s.n)}: </span>
+            {s.title}
+          </span>
+        </h3>
+        <p class="text-base">{s.text}</p>
+        <p class="border-l-2 border-pink pl-4 text-sm text-forest-muted">
+          <span class="font-semibold text-forest">In practice: </span>
+          {s.example}
+        </p>
+      </li>
+    ))}
+  </ol>
+</Section>

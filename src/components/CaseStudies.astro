@@ -1,0 +1,99 @@
+---
+/** Editorial case study cards: problem, solution, challenge, stack and an honestly labelled result. */
+import { Image } from "astro:assets";
+import Section from "./Section.astro";
+import fde from "../content/fde.json";
+import type { Project } from "../lib/projects";
+
+interface Props {
+  projects: Project[];
+}
+const { projects } = Astro.props;
+const { cases } = fde;
+---
+
+<Section id="case-studies" tone="dark" index={2} eyebrow={cases.eyebrow} title={cases.title} intro={cases.intro}>
+  <ol class="space-y-10">
+    {projects.map((p, i) => {
+      const d = p.data;
+      const headingId = `case-${p.id}-title`;
+      return (
+        <li data-reveal>
+          <article
+            aria-labelledby={headingId}
+            class="grid gap-8 rounded-2xl bg-cream p-6 text-forest sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:gap-12"
+            data-project-card
+          >
+            <div>
+              <p class="font-mono text-xs font-semibold tracking-[0.12em] text-forest-muted uppercase">
+                {String(i + 1).padStart(2, "0")} · {d.overview.projectType}
+              </p>
+              <h3 id={headingId} class="mt-3 font-display text-h2 font-semibold">
+                {d.name}
+              </h3>
+              <p class="mt-3 text-lead">{d.title}</p>
+
+              <dl class="mt-6 space-y-4 text-base">
+                <div>
+                  <dt class="font-semibold">The problem</dt>
+                  <dd class="mt-1 text-forest-muted">{d.overview.problem}</dd>
+                </div>
+                <div>
+                  <dt class="font-semibold">The solution</dt>
+                  <dd class="mt-1 text-forest-muted">{d.overview.solution}</dd>
+                </div>
+                <div>
+                  <dt class="font-semibold">Main engineering challenge</dt>
+                  <dd class="mt-1 text-forest-muted">{d.overview.challenge}</dd>
+                </div>
+              </dl>
+            </div>
+
+            <div class="flex flex-col">
+              {d.cover && (
+                <Image
+                  src={d.cover}
+                  alt={d.coverAlt ?? ""}
+                  widths={[480, 720, 960]}
+                  sizes="(min-width: 1024px) 480px, 100vw"
+                  class="w-full rounded-xl ring-1 ring-line"
+                  loading="lazy"
+                />
+              )}
+
+              <p class:list={["border-l-4 border-pink pl-4", d.cover && "mt-6"]}>
+                <span class="block font-mono text-xs font-semibold tracking-[0.12em] text-forest-muted uppercase">
+                  {d.resultKind === "verified" ? "Verified result" : "Status · no measured outcome yet"}
+                </span>
+                <span class="mt-1 block text-base">{d.result}</span>
+              </p>
+
+              <ul class="mt-6 flex flex-wrap gap-2" aria-label={`${d.name} technology`}>
+                {d.tech.slice(0, 6).map((t) => (
+                  <li class="rounded-full border border-line px-3 py-1 text-sm">{t}</li>
+                ))}
+              </ul>
+
+              <div class="mt-auto flex flex-wrap items-center gap-4 pt-8">
+                <a href={`/projects/${p.id}/`} class="btn-primary">
+                  Read the {d.name} case study
+                </a>
+                {d.links.demo && (
+                  <a href={d.links.demo} class="link-underline font-semibold" rel="noopener">
+                    Live demo <span aria-hidden="true">↗</span>
+                  </a>
+                )}
+                {d.links.github && (
+                  <a href={d.links.github} class="link-underline font-semibold" rel="noopener">
+                    Code <span aria-hidden="true">↗</span>
+                    <span class="sr-only"> for {d.name} on GitHub</span>
+                  </a>
+                )}
+              </div>
+            </div>
+          </article>
+        </li>
+      );
+    })}
+  </ol>
+</Section>

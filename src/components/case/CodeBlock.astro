@@ -1,0 +1,10 @@
+---
+/**
+ * Replaces every MDX <pre> in case studies (via `components={{ pre: CodeBlock }}`).
+ * Long lines scroll inside the block on phones, so the block must be keyboard-focusable
+ * (WCAG 2.1.1, axe "scrollable-region-focusable"), like TableWrap.
+ */
+---
+
+{/* eslint-disable-next-line astro/jsx-a11y/no-noninteractive-tabindex -- focusable scroll region, see above */}
+<pre tabindex="0" role="region" aria-label="Code excerpt from the repository"><slot /></pre>

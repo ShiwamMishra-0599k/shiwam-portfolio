@@ -1,0 +1,236 @@
+---
+/**
+ * Architecture of Lumen, drawn from the deep-research-platform repo: README.md, docs/PROJECT_OVERVIEW.md,
+ * research-agent/ARCHITECTURE.md and the code (agent/graph.py, agent/tools.py, http_handler.py,
+ * backend/app/routers/research.py). Colours come from the design tokens.
+ */
+---
+
+<figure class="not-prose my-10">
+  {/* eslint-disable astro/jsx-a11y/no-noninteractive-tabindex -- scrollable on phones, must be keyboard-reachable */}
+  <div
+    class="overflow-x-auto rounded-2xl border border-line bg-cream-soft p-4 sm:p-6"
+    tabindex="0"
+    role="region"
+    aria-label="Lumen architecture diagram (scrolls sideways on small screens)"
+  >
+    {/* eslint-enable astro/jsx-a11y/no-noninteractive-tabindex */}
+    <svg
+      viewBox="0 0 760 520"
+      role="img"
+      aria-labelledby="lu-arch-title lu-arch-desc"
+      class="h-auto w-full min-w-[34rem] font-sans"
+    >
+      <title id="lu-arch-title">Lumen architecture</title>
+      <desc id="lu-arch-desc">
+        A React frontend sends the question with a JWT to a FastAPI backend. The backend saves the user message in
+        PostgreSQL, loads the conversation history and opens a server-sent-events stream to a separate research agent
+        service. The agent runs a Deep Agents ReAct loop on LangGraph with one model chosen at startup: Claude Sonnet
+        through OpenRouter, or GPT-4o through OpenAI if only that key is set. The loop calls 8 tools. Web search falls
+        back from Exa to Tavily to DuckDuckGo, and page reading from Jina Reader to PyMuPDF. Every tool result is cached
+        in Redis with its own expiry, from 5 minutes for crypto prices to 24 hours for places. The agent streams a
+        checkpoint per tool call, then exactly one of blocks, clarification or error, then done. The backend relays each
+        event to the browser and saves the final answer and its blocks in PostgreSQL.
+      </desc>
+      <defs>
+        <marker
+          id="lu-arrow"
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerWidth="7"
+          markerHeight="7"
+          orient="auto-start-reverse"
+        >
+          <path d="M0 0 10 5 0 10z" fill="var(--color-forest)"></path>
+        </marker>
+      </defs>
+      <style>
+        .box {
+          fill: var(--color-cream);
+          stroke: var(--color-forest);
+          stroke-width: 1.5;
+        }
+        .key {
+          fill: var(--color-cream);
+          stroke: var(--color-pink);
+          stroke-width: 3;
+        }
+        .zone {
+          fill: none;
+          stroke: var(--color-line);
+          stroke-width: 1.5;
+          stroke-dasharray: 6 5;
+        }
+        .t {
+          fill: var(--color-forest);
+          font-size: 15px;
+          font-weight: 600;
+        }
+        .s {
+          fill: var(--color-forest-muted);
+          font-size: 12.5px;
+        }
+        .z {
+          fill: var(--color-forest-muted);
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+        }
+        .a {
+          stroke: var(--color-forest);
+          stroke-width: 1.5;
+          fill: none;
+        }
+      </style>
+
+      <!-- Row 1: the three services -->
+      <rect class="box" x="10" y="40" width="190" height="96" rx="12"></rect>
+      <text class="t" x="26" y="68">
+        React UI
+      </text>
+      <text class="s" x="26" y="90">
+        Vite · TypeScript · Zustand
+      </text>
+      <text class="s" x="26" y="108">
+        BlockRenderer + JSON
+      </text>
+      <text class="s" x="26" y="124">
+        fallback for unknown blocks
+      </text>
+
+      <rect class="box" x="275" y="40" width="200" height="96" rx="12"></rect>
+      <text class="t" x="291" y="68">
+        FastAPI backend
+      </text>
+      <text class="s" x="291" y="90">
+        JWT auth · conversations
+      </text>
+      <text class="s" x="291" y="108">
+        relays the agent's SSE,
+      </text>
+      <text class="s" x="291" y="124">
+        saves the final answer
+      </text>
+
+      <rect class="key" x="550" y="40" width="200" height="96" rx="12"></rect>
+      <text class="t" x="566" y="68">
+        Research agent
+      </text>
+      <text class="s" x="566" y="90">
+        FastAPI · Deep Agents
+      </text>
+      <text class="s" x="566" y="108">
+        ReAct loop on LangGraph
+      </text>
+      <text class="s" x="566" y="124">
+        recursion limit 50
+      </text>
+
+      <!-- request arrows -->
+      <path class="a" d="M200 74 H273" marker-end="url(#lu-arrow)"></path>
+      <path class="a" d="M475 74 H548" marker-end="url(#lu-arrow)"></path>
+      <!-- stream arrows back -->
+      <path class="a" d="M548 112 H477" marker-end="url(#lu-arrow)" stroke-dasharray="5 4"></path>
+      <path class="a" d="M273 112 H202" marker-end="url(#lu-arrow)" stroke-dasharray="5 4"></path>
+      <text class="s" x="214" y="30">
+        query + JWT →
+      </text>
+      <text class="s" x="478" y="30">
+        query + history →
+      </text>
+
+      <text class="s" x="10" y="166">
+        ← dashed: server-sent events: checkpoint per tool call, then one of
+      </text>
+      <text class="s" x="10" y="184">
+        blocks / clarification / error, then done
+      </text>
+
+      <!-- Row 2: storage under backend, model under agent -->
+      <rect class="box" x="275" y="214" width="200" height="86" rx="12"></rect>
+      <text class="t" x="291" y="242">
+        PostgreSQL 16
+      </text>
+      <text class="s" x="291" y="264">
+        users · conversations
+      </text>
+      <text class="s" x="291" y="282">
+        messages (blocks as JSONB)
+      </text>
+      <path class="a" d="M375 136 V212" marker-end="url(#lu-arrow)"></path>
+
+      <rect class="box" x="550" y="214" width="200" height="86" rx="12"></rect>
+      <text class="t" x="566" y="242">
+        LLM (chosen at startup)
+      </text>
+      <text class="s" x="566" y="264">
+        Claude Sonnet via OpenRouter
+      </text>
+      <text class="s" x="566" y="282">
+        else GPT-4o via OpenAI
+      </text>
+      <path class="a" d="M650 136 V212" marker-end="url(#lu-arrow)"></path>
+
+      <!-- Row 3: tools zone -->
+      <rect class="zone" x="10" y="330" width="740" height="180" rx="14"></rect>
+      <text class="z" x="26" y="354">
+        8 TOOLS · EVERY RESULT CACHED IN REDIS WITH ITS OWN EXPIRY
+      </text>
+
+      <rect class="box" x="26" y="370" width="228" height="58" rx="10"></rect>
+      <text class="t" x="40" y="394">
+        web_search · 1 h
+      </text>
+      <text class="s" x="40" y="414">
+        Exa → Tavily → DuckDuckGo
+      </text>
+
+      <rect class="box" x="266" y="370" width="228" height="58" rx="10"></rect>
+      <text class="t" x="280" y="394">
+        read_webpage · 6 h
+      </text>
+      <text class="s" x="280" y="414">
+        Jina Reader → PyMuPDF
+      </text>
+
+      <rect class="box" x="506" y="370" width="228" height="58" rx="10"></rect>
+      <text class="t" x="520" y="394">
+        wiki_search · 24 h
+      </text>
+      <text class="s" x="520" y="414">
+        Wikipedia API
+      </text>
+
+      <rect class="box" x="26" y="438" width="228" height="58" rx="10"></rect>
+      <text class="t" x="40" y="462">
+        nearby_places · 24 h
+      </text>
+      <text class="s" x="40" y="482">
+        Nominatim + OSM → map + table
+      </text>
+
+      <rect class="box" x="266" y="438" width="228" height="58" rx="10"></rect>
+      <text class="t" x="280" y="462">
+        latest_news · 15 min
+      </text>
+      <text class="s" x="280" y="482">
+        RSS feeds → table
+      </text>
+
+      <rect class="box" x="506" y="438" width="228" height="58" rx="10"></rect>
+      <text class="t" x="520" y="462">
+        stock · forex · crypto
+      </text>
+      <text class="s" x="520" y="482">
+        5 min–1 h → insight cards
+      </text>
+
+      <path class="a" d="M600 300 V328" marker-end="url(#lu-arrow)"></path>
+    </svg>
+  </div>
+  <figcaption class="mt-3 text-sm text-forest-muted">
+    Drawn from the repo's code and docs. Dashed arrows are the event stream back to the browser. Pink border: where the
+    agent loop runs.
+  </figcaption>
+</figure>
