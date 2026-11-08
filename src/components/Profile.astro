@@ -4,6 +4,8 @@ import fde from "../content/fde.json";
 import { site, hasResume } from "../lib/site";
 
 const { profile } = fde;
+type Job = (typeof profile.experience)[number] & { link?: { label: string; href: string } };
+const experience: Job[] = profile.experience;
 ---
 
 <Section id="profile" tone="dark" index={5} eyebrow={profile.eyebrow} title={profile.title}>
@@ -15,7 +17,7 @@ const { profile } = fde;
 
       <h3 class="mt-14 font-mono text-sm font-semibold tracking-[0.14em] text-cream-muted uppercase">Experience</h3>
       <ol class="mt-6 space-y-10 border-l-2 border-line-dark pl-6">
-        {profile.experience.map((job) => (
+        {experience.map((job) => (
           <li class="relative" data-reveal>
             <span class="absolute top-2 -left-[31px] h-3 w-3 rounded-full bg-pink" aria-hidden="true"></span>
             <p class="font-mono text-sm text-cream-muted">{job.dates}</p>

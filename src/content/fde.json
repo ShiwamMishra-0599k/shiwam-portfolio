@@ -127,20 +127,8 @@
   "profile": {
     "eyebrow": "Engineering profile",
     "title": "Engineering at the intersection of AI, systems and business.",
-    "summary": "AI engineer with 13 months of internships in agentic AI and data science, and a B.Pharm from BIT Mesra. I build LLM features into tested, deployed applications, and I'm aiming that work at healthcare and operations data.",
+    "summary": "AI engineer with hands-on work in agentic AI and data science, and a B.Pharm from BIT Mesra. I build LLM features into tested, deployed applications, and I'm aiming that work at healthcare and operations data.",
     "experience": [
-      {
-        "role": "AI Engineer Intern",
-        "org": "Tipstat",
-        "place": "Bengaluru (onsite)",
-        "dates": "Mar 2026 – Sep 2026",
-        "points": [
-          "Built Lumen, a research agent using a Deep Agents (LangGraph) ReAct loop across 8 custom tools with a 3-tier search fallback (Exa, Tavily, DuckDuckGo).",
-          "Built 14 endpoints across 2 FastAPI services, streaming agent progress to a React/TypeScript UI over Server-Sent Events with 4 response block types.",
-          "Implemented Redis caching with per-tool expiry from 5 minutes to 24 hours, and modelled 3 core entities in PostgreSQL with JWT authentication."
-        ],
-        "link": { "label": "Lumen case study", "href": "/projects/lumen/" }
-      },
       {
         "role": "Data Science Intern",
         "org": "Rubixe",

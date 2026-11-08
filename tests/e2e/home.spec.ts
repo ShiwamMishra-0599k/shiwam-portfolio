@@ -73,7 +73,7 @@ test("more projects: supporting cards; the private Flu repo is not linked", asyn
   );
 });
 
-test("profile: summary, both internships from the resume, link to the Lumen case study", async ({ page }) => {
+test("profile: summary and the experience entries Shiwam approved (no Tipstat entry)", async ({ page }) => {
   await page.goto("/");
   const section = page.locator("#profile");
   await expect(section).toContainText(fde.profile.summary);
@@ -81,7 +81,7 @@ test("profile: summary, both internships from the resume, link to the Lumen case
     await expect(section.getByRole("heading", { name: `${job.role}, ${job.org}` })).toBeVisible();
     await expect(section).toContainText(job.dates);
   }
-  await expect(section.getByRole("link", { name: "Lumen case study" })).toHaveAttribute("href", "/projects/lumen/");
+  await expect(section).not.toContainText("Tipstat");
 });
 
 test("resume: downloads in the profile, the hiring CTA and contact; none without the file", async ({ page }) => {
