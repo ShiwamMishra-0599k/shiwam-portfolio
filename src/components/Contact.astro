@@ -3,7 +3,9 @@ import Section from "./Section.astro";
 import { site, hasResume } from "../lib/site";
 import { LIMITS, formspreeEndpoint } from "../lib/contact";
 
-const endpoint = formspreeEndpoint(import.meta.env.PUBLIC_FORMSPREE_ID);
+// The Formspree form ID is public (it ends up in the HTML), so it lives in site.json.
+// PUBLIC_FORMSPREE_ID overrides it (the browser tests use a fake ID and intercept the request).
+const endpoint = formspreeEndpoint(import.meta.env.PUBLIC_FORMSPREE_ID || site.formspreeId);
 const isDev = import.meta.env.DEV;
 const field =
   "mt-2 block w-full rounded-lg border-2 border-forest bg-cream-soft px-4 py-3 text-base text-forest placeholder:text-forest-muted aria-[invalid=true]:border-pink aria-[invalid=true]:shadow-[0_0_0_3px_var(--color-pink)] focus-visible:shadow-[0_0_0_6px_var(--color-pink)]";
@@ -136,8 +138,9 @@ const field =
         </form>
       ) : isDev ? (
         <p class="rounded-md border-2 border-dashed border-pink px-4 py-3" data-todo>
-          <strong>Placeholder:</strong> the contact form appears once <code>PUBLIC_FORMSPREE_ID</code> is set in
-          <code>.env</code> (or in Vercel). Until then, visitors see the email link instead.
+          <strong>Placeholder:</strong> the contact form appears once <code>formspreeId</code> is set in
+          <code>src/content/site.json</code> (or <code>PUBLIC_FORMSPREE_ID</code> in <code>.env</code>). Until then,
+          visitors see the email link instead.
         </p>
       ) : (
         <p class="text-lead">

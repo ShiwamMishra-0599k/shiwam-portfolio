@@ -3,7 +3,6 @@
   "hero": {
     "eyebrow": "Shiwam Mishra · AI Engineer & Data Scientist",
     "headline": "AI Engineer who ships tested, deployed LLM and data apps",
-    "highlight": "tested, deployed",
     "supporting": "I build with Python, FastAPI, pandas and LLM APIs, and I add the tests and fallbacks that keep an app working when a model or an API doesn't. Based in Bengaluru, open to remote.",
     "proof": {
       "label": "Live now",

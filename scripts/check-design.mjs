@@ -55,8 +55,17 @@ for (const file of walk(join(root, "src", "content"))) {
   });
 }
 // The deploy gate also needs the contact form connected.
-if (process.env.STRICT_TODO === "1" && !/^[A-Za-z0-9]{6,12}$/.test(process.env.PUBLIC_FORMSPREE_ID ?? "")) {
-  todos.push("PUBLIC_FORMSPREE_ID is not set: the contact form would show only an email link");
+if (
+  process.env.STRICT_TODO === "1" &&
+  !/^[A-Za-z0-9]{6,12}$/.test(
+    process.env.PUBLIC_FORMSPREE_ID ||
+      JSON.parse(readFileSync(join(root, "src/content/site.json"), "utf8")).formspreeId ||
+      "",
+  )
+) {
+  todos.push(
+    "No Formspree ID (site.json formspreeId or PUBLIC_FORMSPREE_ID): the contact form would show only an email link",
+  );
 }
 if (todos.length) {
   const msg = `${todos.length} content placeholder(s) still to fill:\n- ${todos.join("\n- ")}`;

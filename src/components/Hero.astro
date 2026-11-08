@@ -3,8 +3,6 @@ import home from "../content/home.json";
 import { site, hasResume } from "../lib/site";
 
 const { hero } = home;
-// Split the headline so the highlighted phrase gets the pink underline.
-const [before, after] = hero.headline.split(hero.highlight);
 ---
 
 <section aria-labelledby="hero-title" class="relative overflow-hidden bg-cream">
@@ -18,9 +16,7 @@ const [before, after] = hero.headline.split(hero.highlight);
       <p class="mt-8 text-sm font-semibold tracking-[0.14em] text-forest-muted uppercase">{hero.eyebrow}</p>
 
       <h1 id="hero-title" class="mt-4 max-w-[16ch] text-display">
-        {before}
-        <span class="hero-highlight">{hero.highlight}</span>
-        {after}
+        {hero.headline}
       </h1>
 
       <p class="mt-8 max-w-[38rem] text-lead text-forest-muted">{hero.supporting}</p>
@@ -77,15 +73,3 @@ const [before, after] = hero.headline.split(hero.highlight);
     </aside>
   </div>
 </section>
-
-<style>
-  /* Pink marker underline behind the highlighted words (decorative; text stays forest). */
-  .hero-highlight {
-    background-image: linear-gradient(var(--color-pink), var(--color-pink));
-    background-repeat: no-repeat;
-    background-size: 100% 0.14em;
-    background-position: 0 92%;
-    box-decoration-break: clone;
-    -webkit-box-decoration-break: clone;
-  }
-</style>
