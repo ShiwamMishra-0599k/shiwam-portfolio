@@ -84,9 +84,7 @@ test("case study: diagram and score table are accessible, cover has alt text", a
 test("Lumen case study: diagram is accessible; contribution and gaps are stated", async ({ page }) => {
   await page.goto("/projects/lumen/");
   await expect(page.getByRole("img", { name: "Lumen architecture" })).toBeVisible();
-  await expect(page.locator("#overview + dl")).toContainText(
-    "Co-developed during my AI Engineer internship at Tipstat",
-  );
+  await expect(page.locator("#overview + dl")).toContainText("I built the ReAct loop and its 8 tools");
   await expect(page.locator(".prose")).toContainText("No automated tests and no evaluation set");
   await expect(page.getByRole("link", { name: /GitHub/ }).first()).toHaveAttribute(
     "href",

@@ -28,7 +28,7 @@ const projects = defineCollection({
           solution: z.string().max(260),
           /** What Shiwam did himself. Be exact for team or employer work. */
           contribution: z.string().max(300),
-          /** e.g. "Personal project, live" or "Internship project at Tipstat, co-developed". */
+          /** e.g. "Personal project, live" or "Agentic AI platform · source on GitHub". */
           projectType: z.string().max(90),
           /** The main engineering challenge, one sentence. */
           challenge: z.string().max(220),

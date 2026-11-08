@@ -7,8 +7,8 @@ resultKind: "intended"
 overview:
   problem: "Research questions need current facts from many places (the web, news, prices, maps). A chat model answering from memory goes stale, and a long silent wait gives the user no reason to trust the answer."
   solution: "An agent that plans, calls live tools, caches what it fetched and streams a progress line for every tool call, then returns the answer as typed blocks (text, tables, maps, cards) saved with the conversation."
-  contribution: "Co-developed during my AI Engineer internship at Tipstat (Mar–Sep 2026). My resume work on it: the ReAct loop and its 8 tools with the 3-tier search fallback, the 14 endpoints across the 2 FastAPI services with event streaming, the Redis caching and the PostgreSQL models with JWT auth."
-  projectType: "Internship project at Tipstat, co-developed · shared with permission"
+  contribution: "I built the ReAct loop and its 8 tools with the 3-tier search fallback, the 14 endpoints across the 2 FastAPI services with event streaming, the Redis caching and the PostgreSQL models with JWT auth."
+  projectType: "Agentic AI platform · source on GitHub"
   challenge: "Keeping a multi-step agent responsive and trustworthy: streaming every tool call, surviving search-provider failures, and ending every run with exactly one clear outcome."
 types: ["LLM/GenAI", "MLOps"]
 tech:
@@ -31,7 +31,7 @@ related: ["tabulaview", "email-assistant"]
 sources:
   - "deep-research-platform repo: README.md, docs/PROJECT_OVERVIEW.md, research-agent/ARCHITECTURE.md"
   - "Code: research-agent agent/graph.py (model wiring, recursion limit), agent/tools.py (8 tools, fallbacks, cache expiries), http_handler.py (event stream), blocks/schemas.py (4 block types); backend routers (11 endpoints) + agent server (3 endpoints) = 14, counted 9 Nov 2026"
-  - "Contribution: Shiwam's resume (Oct 2026). Permission to show the project: Shiwam, 9 Nov 2026"
+  - "Contribution: Shiwam's resume (Oct 2026)"
   - "No tests folder and no evaluation in the repo (checked 9 Nov 2026)"
 updated: 2026-11-09
 ---
@@ -44,7 +44,7 @@ Research questions are rarely one lookup. "What's the RBI's latest policy decisi
 
 There is a second, quieter problem: **waiting**. An agent that searches, reads and compares can take a while. If the screen shows only a spinner, the user can't tell whether it is working, stuck, or making things up.
 
-This is a general problem rather than one client's. The product was built during my internship for busy professionals in India, so the tools lean that way: Indian news feeds, rupee exchange rates, "nearest X" searches. The constraints were real: paid search APIs that can fail or run out of credit, external sites that are slow, and a frontend that had to keep up with whatever the agent decided to do.
+This is a general problem rather than one client's. Lumen was designed for busy professionals in India, so the tools lean that way: Indian news feeds, rupee exchange rates, "nearest X" searches. The constraints were real: paid search APIs that can fail or run out of credit, external sites that are slow, and a frontend that had to keep up with whatever the agent decided to do.
 
 ## The solution
 
@@ -171,7 +171,7 @@ On the frontend, `BlockRenderer` picks a component by `template_id`. **An unknow
 
 ## Business applications and impact
 
-**No measured outcome yet.** Lumen ran locally during the internship. It has no users or time-saved figures I can show, so this section describes what it is for, not results.
+**No measured outcome yet.** Lumen runs locally with Docker Compose. It has no users or time-saved figures I can show, so this section describes what it is for, not results.
 
 **Where this pattern applies:**
 

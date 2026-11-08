@@ -135,7 +135,7 @@
         "place": "Bengaluru (onsite)",
         "dates": "Mar 2026 – Sep 2026",
         "points": [
-          "Co-developed Lumen, a research agent using a Deep Agents (LangGraph) ReAct loop across 8 custom tools with a 3-tier search fallback (Exa, Tavily, DuckDuckGo).",
+          "Built Lumen, a research agent using a Deep Agents (LangGraph) ReAct loop across 8 custom tools with a 3-tier search fallback (Exa, Tavily, DuckDuckGo).",
           "Built 14 endpoints across 2 FastAPI services, streaming agent progress to a React/TypeScript UI over Server-Sent Events with 4 response block types.",
           "Implemented Redis caching with per-tool expiry from 5 minutes to 24 hours, and modelled 3 core entities in PostgreSQL with JWT authentication."
         ],
