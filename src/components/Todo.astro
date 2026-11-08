@@ -1,0 +1,22 @@
+---
+/**
+ * Renders copy that may still be a placeholder. Strings starting with "TODO:" show as a clearly
+ * marked dashed box so a missing fact is never mistaken for real content. `npm test` lists them,
+ * and they must all be replaced before deploy (Phase 7 gate).
+ */
+interface Props {
+  text: string;
+  as?: "p" | "li" | "span";
+  class?: string;
+}
+const { text, as: Tag = "p", class: className } = Astro.props;
+const todo = text.trim().startsWith("TODO:");
+---
+
+{todo ? (
+  <Tag class:list={["rounded-md border-2 border-dashed border-pink px-3 py-2 text-base", className]} data-todo>
+    <strong class="font-semibold">Placeholder:</strong> {text.replace(/^\s*TODO:\s*/, "")}
+  </Tag>
+) : (
+  <Tag class={className}>{text}</Tag>
+)}

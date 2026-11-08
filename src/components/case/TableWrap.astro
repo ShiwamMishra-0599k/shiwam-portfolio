@@ -1,0 +1,14 @@
+---
+/**
+ * Replaces every Markdown/MDX <table> in case studies (via `components={{ table: TableWrap }}`).
+ * Wide tables scroll inside this region on phones, never the page. A scrollable region must be
+ * keyboard-focusable so keyboard users can scroll it (WCAG 2.1.1, axe "scrollable-region-focusable").
+ */
+---
+
+{/* eslint-disable-next-line astro/jsx-a11y/no-noninteractive-tabindex -- focusable scroll region, see above */}
+<div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable table">
+  <table>
+    <slot />
+  </table>
+</div>

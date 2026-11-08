@@ -1,0 +1,35 @@
+{
+  "name": "Shiwam Mishra",
+  "role": "AI Engineer · Data Scientist",
+  "tagline": "AI Engineer who ships tested, deployed LLM and data apps",
+  "status": "Open to AI Engineer / Data Scientist roles",
+  "location": "Bengaluru, India · open to remote",
+  "url": "https://shiwam-portfolio.vercel.app",
+  "links": {
+    "email": "shiwammishrayt@gmail.com",
+    "github": "https://github.com/ShiwamMishra-0599k",
+    "linkedin": "https://www.linkedin.com/in/shiwammishra01/"
+  },
+  "resume": {
+    "path": "/resume.pdf",
+    "note": "The Download resume button only appears when public/resume.pdf exists."
+  },
+  "showInternship": false,
+  "internship": {
+    "title": "Data Science Intern",
+    "organisation": "Rubixe.ai",
+    "dates": "Sep 2025 – Feb 2026"
+  },
+  "seo": {
+    "title": "Shiwam Mishra · AI Engineer & Data Scientist",
+    "description": "Shiwam Mishra builds tested, deployed LLM and data applications. Projects, case studies and contact for AI Engineer and Data Scientist roles.",
+    "ogImage": "/og/default.png",
+    "locale": "en_IN"
+  },
+  "nav": [
+    { "label": "Projects", "href": "/#projects" },
+    { "label": "Skills", "href": "/#skills" },
+    { "label": "Education", "href": "/#education" },
+    { "label": "About", "href": "/#about" }
+  ]
+}

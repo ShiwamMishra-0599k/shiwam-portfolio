@@ -1,0 +1,160 @@
+---
+/** Pipeline of the Email Assistant, drawn from the repo's main.py and call_gemini.py. Colours are design tokens. */
+---
+
+<figure class="not-prose my-10">
+  {/* eslint-disable astro/jsx-a11y/no-noninteractive-tabindex -- scrollable on phones, must be keyboard-reachable */}
+  <div
+    class="overflow-x-auto rounded-2xl border border-line bg-cream-soft p-4 sm:p-6"
+    tabindex="0"
+    role="region"
+    aria-label="Pipeline diagram (scrolls sideways on small screens)"
+  >
+    {/* eslint-enable astro/jsx-a11y/no-noninteractive-tabindex */}
+    <svg
+      viewBox="0 0 760 330"
+      role="img"
+      aria-labelledby="ea-title ea-desc"
+      class="h-auto w-full min-w-[34rem] font-sans"
+    >
+      <title id="ea-title">Email Assistant pipeline</title>
+      <desc id="ea-desc">
+        A FastAPI endpoint fetches the 5 latest Gmail messages. Each email gets a profanity check, then four Gemini 2.5
+        Flash calls: sentiment, summary, a JSON classification of the summary into urgency, intent and topic, and a
+        draft reply. The email is embedded with all-MiniLM-L6-v2 and stored in ChromaDB; the most similar past email's
+        reply is retrieved and given to Gemini as a tone example. An auto-reply flag is set when the email is not urgent
+        and not FYI. A second endpoint sends a reply through the Gmail API.
+      </desc>
+      <defs>
+        <marker
+          id="ea-arrow"
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerWidth="7"
+          markerHeight="7"
+          orient="auto-start-reverse"
+        >
+          <path d="M0 0 10 5 0 10z" fill="var(--color-forest)"></path>
+        </marker>
+      </defs>
+      <style>
+        .box {
+          fill: var(--color-cream);
+          stroke: var(--color-forest);
+          stroke-width: 1.5;
+        }
+        .key {
+          fill: var(--color-cream);
+          stroke: var(--color-pink);
+          stroke-width: 3;
+        }
+        .t {
+          fill: var(--color-forest);
+          font-size: 15px;
+          font-weight: 600;
+        }
+        .s {
+          fill: var(--color-forest-muted);
+          font-size: 12.5px;
+        }
+        .a {
+          stroke: var(--color-forest);
+          stroke-width: 1.5;
+          fill: none;
+          marker-end: url(#ea-arrow);
+        }
+      </style>
+
+      <rect class="box" x="10" y="30" width="150" height="74" rx="10"></rect>
+      <text class="t" x="24" y="56">
+        Gmail API
+      </text>
+      <text class="s" x="24" y="78">
+        5 latest inbox
+      </text>
+      <text class="s" x="24" y="93">
+        messages (OAuth)
+      </text>
+
+      <rect class="box" x="190" y="30" width="150" height="74" rx="10"></rect>
+      <text class="t" x="204" y="56">
+        Guardrail
+      </text>
+      <text class="s" x="204" y="78">
+        profanity flag
+      </text>
+      <text class="s" x="204" y="93">
+        (better-profanity)
+      </text>
+
+      <rect class="key" x="370" y="10" width="220" height="140" rx="10"></rect>
+      <text class="t" x="384" y="36">
+        Gemini 2.5 Flash
+      </text>
+      <text class="s" x="384" y="60">
+        1. sentiment
+      </text>
+      <text class="s" x="384" y="80">
+        2. summary
+      </text>
+      <text class="s" x="384" y="100">
+        3. classify summary → JSON
+      </text>
+      <text class="s" x="384" y="116">
+        {" "}
+        urgency · intent · topic
+      </text>
+      <text class="s" x="384" y="136">
+        4. draft reply
+      </text>
+
+      <rect class="box" x="370" y="200" width="220" height="90" rx="10"></rect>
+      <text class="t" x="384" y="226">
+        ChromaDB (local)
+      </text>
+      <text class="s" x="384" y="248">
+        all-MiniLM-L6-v2 embeddings
+      </text>
+      <text class="s" x="384" y="266">
+        top-1 similar email's reply
+      </text>
+      <text class="s" x="384" y="282">
+        → tone example for step 4
+      </text>
+
+      <rect class="box" x="620" y="30" width="130" height="104" rx="10"></rect>
+      <text class="t" x="634" y="56">
+        FastAPI
+      </text>
+      <text class="s" x="634" y="78">
+        auto-reply flag:
+      </text>
+      <text class="s" x="634" y="93">
+        not urgent and
+      </text>
+      <text class="s" x="634" y="108">
+        not FYI
+      </text>
+
+      <rect class="box" x="620" y="200" width="130" height="74" rx="10"></rect>
+      <text class="t" x="634" y="226">
+        Send reply
+      </text>
+      <text class="s" x="634" y="248">
+        via Gmail API
+      </text>
+
+      <path class="a" d="M160 67 H186"></path>
+      <path class="a" d="M340 67 H366"></path>
+      <path class="a" d="M590 80 H616"></path>
+      <path class="a" d="M480 196 V154"></path>
+      <path class="a" d="M685 134 V196"></path>
+      <path class="a" d="M265 104 V245 H366"></path>
+    </svg>
+  </div>
+  <figcaption class="mt-3 text-sm text-forest-muted">
+    One request processes up to 5 emails, one after another. Drawn from <code>main.py</code> and
+    <code>call_gemini.py</code>.
+  </figcaption>
+</figure>

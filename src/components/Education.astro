@@ -1,0 +1,68 @@
+---
+import Section from "./Section.astro";
+import education from "../content/education.json";
+import { site } from "../lib/site";
+
+// The only work entry the site may ever show, and only when Shiwam switches it on (site.json → showInternship).
+const internship = site.showInternship && !site.internship.dates.startsWith("TODO:") ? site.internship : null;
+---
+
+<Section id="education" tone="dark" index={3} eyebrow="Education" title="Education & certifications">
+  <div class="grid gap-12 lg:grid-cols-2" data-reveal>
+    <div class="space-y-10">
+      <div>
+        <h3 class="font-sans text-sm font-semibold tracking-[0.14em] text-cream-muted uppercase">Degree</h3>
+        <ul class="mt-4 space-y-6">
+          {education.degrees.map((d) => (
+            <li>
+              <p class="font-display text-h3 font-semibold">{d.title}</p>
+              <p class="mt-1">
+                {d.institution} · {d.date}
+              </p>
+              {d.note && <p class="mt-2 text-cream-muted">{d.note}</p>}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="font-sans text-sm font-semibold tracking-[0.14em] text-cream-muted uppercase">Training</h3>
+        <ul class="mt-4 space-y-6">
+          {education.training.map((t) => (
+            <li>
+              <p class="font-display text-h3 font-semibold">{t.title}</p>
+              <p class="mt-1">{t.institution}</p>
+              <p class="mt-2 text-cream-muted">{t.detail}</p>
+            </li>
+          ))}
+          {internship && (
+            <li>
+              <p class="font-display text-h3 font-semibold">{internship.title}</p>
+              <p class="mt-1">
+                {internship.organisation} · {internship.dates}
+              </p>
+            </li>
+          )}
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="font-sans text-sm font-semibold tracking-[0.14em] text-cream-muted uppercase">Certifications</h3>
+      <ul class="mt-4 divide-y divide-line-dark border-y border-line-dark">
+        {education.certifications.map((c) => (
+          <li class="flex gap-4 py-5">
+            <svg aria-hidden="true" class="mt-1 shrink-0" width="18" height="18" viewBox="0 0 18 18">
+              <circle cx="9" cy="9" r="8" fill="none" stroke="var(--color-pink)" stroke-width="2" />
+              <path d="M5.5 9.5 8 12l4.5-6" fill="none" stroke="var(--color-pink)" stroke-width="2" />
+            </svg>
+            <div>
+              <p class="font-semibold">{c.title}</p>
+              <p class="mt-1 text-cream-muted">{c.issuer}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</Section>

@@ -1,0 +1,44 @@
+# build output
+dist/
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# environment variables
+.env
+.env.production
+
+# macOS-specific files
+.DS_Store
+
+# jetbrains setting folder
+.idea/
+
+# test output
+test-results/
+playwright-report/
+
+# vercel
+.vercel/
+
+# env (keep the example)
+.env.*
+!.env.example
+lighthouse-reports/
+
+# Private working notes and lists: stay on this PC, never in the public repo
+private/
+CLAUDE.md
+CLAUDE.local.md
+PLAN.md
+memory.md
+CONTENT_CHECKLIST.md

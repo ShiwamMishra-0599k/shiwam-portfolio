@@ -1,0 +1,57 @@
+---
+/**
+ * A small single-series bar table: one row per item, value printed as text, bar is decoration.
+ * Used where there are only a few numbers. A real <table> keeps it readable without the bars.
+ */
+interface Row {
+  label: string;
+  value: number;
+  note?: string;
+  emphasis?: boolean;
+}
+interface Props {
+  caption: string;
+  rows: Row[];
+  max: number;
+  unit?: string;
+}
+const { caption, rows, max, unit = "" } = Astro.props;
+---
+
+<figure class="not-prose my-8">
+  <table class="w-full border-collapse text-left text-base">
+    <caption class="mb-3 text-left text-sm font-semibold tracking-[0.08em] text-forest-muted uppercase">
+      {caption}
+    </caption>
+    <thead class="sr-only">
+      <tr>
+        <th scope="col">Item</th>
+        <th scope="col">Score</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr class="border-t border-line">
+          <th scope="row" class="w-[45%] py-3 pr-4 align-top font-medium">
+            {r.label}
+            {r.note && <span class="block text-sm font-normal text-forest-muted">{r.note}</span>}
+          </th>
+          <td class="py-3 align-top">
+            <div class="flex items-center gap-3">
+              <span class="relative h-3 flex-1 overflow-hidden rounded-full bg-cream-deep" aria-hidden="true">
+                <span
+                  class:list={["absolute inset-y-0 left-0 rounded-full", r.emphasis ? "bg-forest" : "bg-forest-muted"]}
+                  style={`width:${Math.max(0, Math.min(100, (r.value / max) * 100))}%`}
+                />
+              </span>
+              <span class="w-14 shrink-0 text-right font-semibold tabular-nums">
+                {r.value}
+                {unit}
+              </span>
+            </div>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</figure>

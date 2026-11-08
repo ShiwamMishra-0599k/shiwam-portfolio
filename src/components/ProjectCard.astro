@@ -1,0 +1,89 @@
+---
+import { Image } from "astro:assets";
+import { projectUrl, type Project } from "../lib/projects";
+
+interface Props {
+  project: Project;
+  headingLevel?: "h3" | "h2";
+}
+const { project, headingLevel: H = "h3" } = Astro.props;
+const { data } = project;
+const href = projectUrl(project);
+---
+
+<article
+  class="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-cream-soft text-forest ring-1 ring-line transition-shadow hover:shadow-[6px_6px_0_0_var(--color-pink)]"
+  data-project-card
+  data-types={data.types.join("|")}
+>
+  {data.cover ? (
+    <div class="aspect-[16/8] overflow-hidden border-b border-line bg-forest">
+      <Image
+        src={data.cover}
+        alt=""
+        widths={[400, 640, 960]}
+        sizes="(min-width: 1024px) 34rem, (min-width: 768px) 50vw, 100vw"
+        class="h-full w-full object-cover object-left-top"
+        loading="lazy"
+      />
+    </div>
+  ) : (
+    /* No screenshot yet: a typographic banner (decorative), never a stand-in image. */
+    <div
+      class="tone-dark relative flex aspect-[16/8] flex-col justify-end overflow-hidden border-b border-line bg-forest p-6 text-cream sm:p-7"
+      aria-hidden="true"
+    >
+      <span class="absolute -top-6 -right-4 font-display text-[9rem] leading-none font-semibold text-line-dark select-none">
+        {data.name.charAt(0)}
+      </span>
+      <span class="relative font-display text-[1.75rem] leading-tight font-semibold">{data.name}</span>
+      <span class="relative mt-3 h-1 w-16 rounded-full bg-pink"></span>
+    </div>
+  )}
+  <div class="flex flex-1 flex-col p-6 sm:p-7">
+    <ul class="flex flex-wrap gap-2" aria-label="Project type">
+      {data.types.map((t) => (
+        <li class="rounded-full bg-forest px-2.5 py-0.5 text-xs font-semibold tracking-wide text-cream">{t}</li>
+      ))}
+    </ul>
+    <p class="mt-5 text-sm font-semibold tracking-[0.14em] text-forest-muted uppercase">{data.name}</p>
+    <H class="mt-2 text-h3">
+      <a href={href} class="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none">
+        {data.title}
+      </a>
+    </H>
+    <p class="mt-5 border-l-4 border-pink pl-4 text-base">
+      <span class="sr-only">Result: </span>
+      {data.result}
+    </p>
+    <ul class="mt-5 flex flex-wrap gap-x-3 gap-y-1 text-sm text-forest-muted" aria-label="Tech">
+      {data.tech.slice(0, 6).map((t) => (
+        <li>{t}</li>
+      ))}
+    </ul>
+    <div class="relative z-10 mt-auto flex flex-wrap items-center gap-x-6 gap-y-3 pt-7 text-base font-semibold">
+      <a href={href} class="link-underline" aria-label={`Read the ${data.name} case study`}>
+        Case study →
+      </a>
+      {data.links.demo && (
+        <a href={data.links.demo} class="link-underline" rel="noopener" aria-label={`${data.name} live demo`}>
+          Live demo ↗
+        </a>
+      )}
+      {data.links.github && (
+        <a href={data.links.github} class="link-underline" rel="noopener" aria-label={`${data.name} on GitHub`}>
+          GitHub ↗
+        </a>
+      )}
+    </div>
+  </div>
+</article>
+
+<style>
+  /* The whole card is clickable (stretched link); show the focus ring on the card itself. */
+  article:has(h3 a:focus-visible, h2 a:focus-visible) {
+    outline: 3px solid var(--color-forest);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 6px var(--color-pink);
+  }
+</style>

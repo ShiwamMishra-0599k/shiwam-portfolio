@@ -1,0 +1,42 @@
+{
+  "_note": "Hero and About copy. Every line is from a confirmed fact (sources in memory.md). Strings starting with 'TODO:' render as visible placeholders and must be replaced before deploy (npm test lists them).",
+  "hero": {
+    "eyebrow": "Shiwam Mishra · AI Engineer & Data Scientist",
+    "headline": "AI Engineer who ships tested, deployed LLM and data apps",
+    "highlight": "tested, deployed",
+    "supporting": "I build with Python, FastAPI, pandas and LLM APIs, and I add the tests and fallbacks that keep an app working when a model or an API doesn't. Based in Bengaluru, open to remote.",
+    "proof": {
+      "label": "Live now",
+      "title": "TabulaView.ai",
+      "summary": "Upload a CSV or Excel file and get data-quality checks, a KPI dashboard and a printable report.",
+      "facts": [
+        "Live demo on Vercel (free sign-in with Google or GitHub)",
+        "309 automated backend tests",
+        "AI summaries checked against the computed numbers"
+      ],
+      "href": "https://tabulavibe-ai.vercel.app",
+      "linkLabel": "Open the live demo"
+    }
+  },
+  "about": {
+    "title": "From pharmacy to AI engineering",
+    "paragraphs": [
+      "I studied pharmacy at Birla Institute of Technology, Mesra (B.Pharm, 2024), then retrained in data science through an 8-month program with four capstone projects.",
+      "Since then I've moved from notebooks to applications: an AI email assistant built on Gmail, Gemini and ChromaDB, and TabulaView.ai, a tested, deployed data app where the AI's summaries are checked against the numbers it is describing.",
+      "Pharmacy is still where I want to aim this: applying AI to healthcare data, where every claim has to be checked against its source. That habit runs through the projects on this site."
+    ],
+    "curious": {
+      "title": "What I'm curious about",
+      "items": [
+        "Evaluating LLM output: checking what an AI says against the numbers it actually computed.",
+        "Tool-calling agents that fail safely, with a fallback when a model or provider is down.",
+        "AI on healthcare and pharma data."
+      ]
+    },
+    "team": {
+      "title": "The team I want to join",
+      "text": "A small, AI-first team where I can own work end to end, from data to deployed feature. Healthcare and pharma are a plus, since that's where my pharmacy background helps."
+    },
+    "portraitAlt": "Portrait of Shiwam Mishra"
+  }
+}

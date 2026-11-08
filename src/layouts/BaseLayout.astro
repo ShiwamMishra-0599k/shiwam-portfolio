@@ -1,0 +1,96 @@
+---
+import "../styles/global.css";
+import { ClientRouter } from "astro:transitions";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import Reveal from "../components/Reveal.astro";
+import { site, publicFileExists } from "../lib/site";
+import { toJsonLd } from "../lib/seo";
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Path under /public of a 1200×630 PNG for social previews. Falls back to the site default. */
+  ogImage?: string;
+  ogImageAlt?: string;
+  ogType?: "website" | "article";
+  /** Structured data for this page (JSON-LD). */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  noindex?: boolean;
+}
+const {
+  title,
+  description = site.seo.description,
+  ogImage = site.seo.ogImage,
+  ogImageAlt = `${site.name}: ${site.tagline}`,
+  ogType = "website",
+  jsonLd,
+  noindex = false,
+} = Astro.props;
+const pageTitle = title ? `${title} · ${site.name}` : site.seo.title;
+const base = Astro.site ?? site.url;
+// Pages are built as folders (/projects/x/index.html), so canonical URLs end in "/" like the sitemap.
+const path = Astro.url.pathname.endsWith("/") ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const canonical = new URL(path, base).href;
+// Use the page's own preview image if it exists, else the site default, else none (never a broken URL).
+const ogPath = [ogImage, site.seo.ogImage].find((p) => publicFileExists(p));
+const ogImageUrl = ogPath ? new URL(ogPath, base).href : null;
+const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#1e3b2f" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="generator" content={Astro.generator} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="author" content={site.name} />
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content={site.seo.locale} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {ogImageUrl && (
+      <>
+        <meta property="og:image" content={ogImageUrl} />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={ogImageAlt} />
+      </>
+    )}
+    <meta name="twitter:card" content={ogImageUrl ? "summary_large_image" : "summary"} />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+    {ogImageUrl && <meta name="twitter:image:alt" content={ogImageAlt} />}
+
+    {ld.map((data) => (
+      <script type="application/ld+json" set:html={toJsonLd(data)} />
+    ))}
+    <ClientRouter fallback="swap" />
+  </head>
+  <body class="min-h-dvh">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-full focus:bg-pink focus:px-5 focus:py-3 focus:font-semibold focus:text-forest-ink"
+    >
+      Skip to content
+    </a>
+    <Nav />
+    <main id="main" tabindex="-1" class="focus:outline-none">
+      <slot />
+    </main>
+    <Footer />
+    <Reveal />
+  </body>
+</html>

@@ -1,0 +1,32 @@
+---
+/** Installs the fade-up-on-scroll observer once per page. See global.css for the styles. */
+---
+
+<script>
+  function initReveal() {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const items = [...document.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-revealed)")];
+    if (reduce || !("IntersectionObserver" in window) || items.length === 0) {
+      items.forEach((el) => el.classList.add("is-revealed"));
+      return;
+    }
+    // Anything already on screen when the page loads is shown immediately (no flash, no delay).
+    const fold = window.innerHeight;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          e.target.classList.add("is-revealed");
+          observer.unobserve(e.target);
+        }
+      },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.08 },
+    );
+    for (const el of items) {
+      if (el.getBoundingClientRect().top < fold) el.classList.add("is-revealed");
+      else observer.observe(el);
+    }
+    document.documentElement.classList.add("reveal-ready");
+  }
+  document.addEventListener("astro:page-load", initReveal);
+</script>

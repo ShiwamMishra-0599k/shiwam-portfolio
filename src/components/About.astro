@@ -1,0 +1,56 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import Section from "./Section.astro";
+import Todo from "./Todo.astro";
+import home from "../content/home.json";
+
+const { about } = home;
+
+// The portrait renders only if Shiwam has added src/assets/portrait.(jpg|jpeg|png|webp).
+// No placeholder image, stock photo or generated face: without it, About is text-only.
+const found = import.meta.glob<{ default: ImageMetadata }>("../assets/portrait.{jpg,jpeg,png,webp}", { eager: true });
+const portrait = Object.values(found)[0]?.default;
+---
+
+<Section id="about" index={4} eyebrow="About" title={about.title}>
+  <div
+    class:list={["grid gap-12", portrait && "md:grid-cols-[minmax(0,1fr)_16rem] lg:grid-cols-[minmax(0,1fr)_20rem]"]}
+  >
+    <div class="max-w-(--container-prose)" data-reveal>
+      <div class="space-y-5 text-lead">
+        {about.paragraphs.map((p) => (
+          <Todo text={p} />
+        ))}
+      </div>
+
+      <div class="mt-12 grid gap-10 sm:grid-cols-2">
+        <div>
+          <h3 class="text-h3">{about.curious.title}</h3>
+          <ul class="mt-4 space-y-3">
+            {about.curious.items.map((item) => (
+              <Todo as="li" text={item} />
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-h3">{about.team.title}</h3>
+          <Todo text={about.team.text} class="mt-4" />
+        </div>
+      </div>
+    </div>
+
+    {portrait && (
+      <figure class="md:order-last">
+        <Image
+          src={portrait}
+          alt={about.portraitAlt}
+          widths={[320, 480, 640]}
+          sizes="(min-width: 1024px) 20rem, (min-width: 768px) 16rem, 100vw"
+          class="aspect-[4/5] w-full rounded-2xl object-cover shadow-[6px_6px_0_0_var(--color-pink)]"
+          loading="lazy"
+        />
+      </figure>
+    )}
+  </div>
+</Section>

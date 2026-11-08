@@ -1,0 +1,57 @@
+---
+/**
+ * A page section. Alternates cream / forest for rhythm.
+ * `index` renders the editorial number (01, 02 …) next to the eyebrow.
+ */
+interface Props {
+  id: string;
+  /** light = cream, soft = deeper cream band (used before the forest footer), dark = forest */
+  tone?: "light" | "soft" | "dark";
+  index?: number;
+  eyebrow?: string;
+  title: string;
+  intro?: string;
+}
+const { id, tone = "light", index, eyebrow, title, intro } = Astro.props;
+const dark = tone === "dark";
+// Secondary text colour per tone. forest-muted is only 4.43:1 on cream-deep, so soft sections use forest.
+const muted = dark ? "text-cream-muted" : tone === "soft" ? "text-forest" : "text-forest-muted";
+const headingId = `${id}-title`;
+---
+
+<section
+  id={id}
+  aria-labelledby={headingId}
+  class:list={[
+    "scroll-mt-20",
+    dark ? "tone-dark bg-forest text-cream" : tone === "soft" ? "bg-cream-deep text-forest" : "bg-cream text-forest",
+  ]}
+>
+  <div class="mx-auto max-w-(--container-content) px-4 py-20 sm:px-6 md:py-28 lg:px-8">
+    <header class="grid gap-6 md:grid-cols-[10rem_1fr] md:gap-10" data-reveal>
+      <p class:list={["flex items-baseline gap-3 text-sm font-semibold tracking-[0.14em] uppercase", muted]}>
+        {index !== undefined && (
+          <span
+            aria-hidden="true"
+            class:list={[
+              "font-display text-[1.5rem] leading-none font-semibold tracking-normal",
+              dark ? "text-pink" : "border-b-2 border-pink text-forest",
+            ]}
+          >
+            {String(index).padStart(2, "0")}
+          </span>
+        )}
+        {eyebrow}
+      </p>
+      <div>
+        <h2 id={headingId} class="text-h2">
+          {title}
+        </h2>
+        {intro && <p class:list={["mt-4 max-w-(--container-prose) text-lead", muted]}>{intro}</p>}
+      </div>
+    </header>
+    <div class="mt-12 md:ml-[12.5rem]">
+      <slot />
+    </div>
+  </div>
+</section>

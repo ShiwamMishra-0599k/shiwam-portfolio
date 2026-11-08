@@ -1,0 +1,77 @@
+---
+import ProjectCard from "./ProjectCard.astro";
+import { PROJECT_TYPES } from "../content.config";
+import type { Project } from "../lib/projects";
+
+interface Props {
+  projects: Project[];
+}
+const { projects } = Astro.props;
+// Only offer filters that match at least one project.
+const types = PROJECT_TYPES.filter((t) => projects.some((p) => p.data.types.includes(t)));
+---
+
+<div data-projects>
+  <!-- Filters need JavaScript, so they stay hidden without it; every card shows. -->
+  <div
+    class="mb-8 flex flex-wrap items-center gap-2"
+    role="group"
+    aria-label="Filter projects by type"
+    hidden
+    data-filters
+  >
+    {["All", ...types].map((t) => (
+      <button
+        type="button"
+        data-filter={t}
+        aria-pressed={t === "All" ? "true" : "false"}
+        class="min-h-11 rounded-full border-2 border-cream-muted px-4 text-sm font-semibold transition-colors hover:border-cream aria-pressed:border-pink aria-pressed:bg-pink aria-pressed:text-forest-ink"
+      >
+        {t}
+      </button>
+    ))}
+  </div>
+  <p class="sr-only" aria-live="polite" data-filter-status></p>
+
+  <ul class="grid gap-8 lg:grid-cols-2">
+    {projects.map((p, i) => (
+      <li data-project-item data-types={p.data.types.join("|")} data-reveal style={`--reveal-delay:${i * 90}ms`}>
+        <ProjectCard project={p} />
+      </li>
+    ))}
+  </ul>
+  <p class="mt-8 text-cream-muted" hidden data-filter-empty>
+    No projects of this type yet.
+  </p>
+</div>
+
+<script>
+  function initFilters() {
+    for (const root of document.querySelectorAll<HTMLElement>("[data-projects]")) {
+      const bar = root.querySelector<HTMLElement>("[data-filters]");
+      const status = root.querySelector<HTMLElement>("[data-filter-status]");
+      const empty = root.querySelector<HTMLElement>("[data-filter-empty]");
+      const items = [...root.querySelectorAll<HTMLElement>("[data-project-item]")];
+      const buttons = [...root.querySelectorAll<HTMLButtonElement>("[data-filter]")];
+      if (!bar || bar.dataset.ready) continue;
+      bar.dataset.ready = "true";
+      bar.hidden = false;
+
+      const apply = (type: string) => {
+        let shown = 0;
+        for (const item of items) {
+          const match = type === "All" || (item.dataset.types ?? "").split("|").includes(type);
+          item.hidden = !match;
+          if (match) shown++;
+        }
+        for (const b of buttons) b.setAttribute("aria-pressed", String(b.dataset.filter === type));
+        if (empty) empty.hidden = shown > 0;
+        if (status)
+          status.textContent = `Showing ${shown} ${shown === 1 ? "project" : "projects"}${type === "All" ? "" : ` tagged ${type}`}.`;
+      };
+      for (const b of buttons) b.addEventListener("click", () => apply(b.dataset.filter ?? "All"));
+    }
+  }
+  initFilters();
+  document.addEventListener("astro:after-swap", initFilters);
+</script>

@@ -1,0 +1,154 @@
+---
+title: "Checked dashboards from messy spreadsheets, with AI findings verified against the data"
+name: "TabulaView.ai"
+summary: "Upload a CSV or Excel file and get data-quality checks, a KPI dashboard and a PDF or PowerPoint report. An optional AI analyst explains the data, and every number it writes is checked against evidence that Python computed."
+result: "Live on Vercel with 309 backend tests. In live runs the scorecard kept unverifiable AI figures off the dashboard (rules-based 100 vs AI 69.6 and 75.6)."
+types: ["LLM/GenAI", "Data Analysis"]
+tech:
+  [
+    "Python",
+    "FastAPI",
+    "pandas",
+    "React",
+    "TypeScript",
+    "Groq + NVIDIA LLM APIs",
+    "Supabase (Postgres, RLS)",
+    "Vercel",
+    "pytest",
+    "Playwright",
+  ]
+links:
+  demo: "https://tabulavibe-ai.vercel.app"
+  demoNote: "Free sign-in with Google or GitHub to upload a file or try a sample."
+  github: "https://github.com/ShiwamMishra-0599k/tabulavibe-ai"
+  writeup: "https://github.com/ShiwamMishra-0599k/tabulavibe-ai/blob/main/docs/AGENT_WORKFLOW.md"
+cover: "../../assets/projects/tabulavibe/landing.png"
+coverAlt: "TabulaView.ai landing page: the headline 'Turn a spreadsheet into a verified dashboard', a sign-in-to-upload panel, and an example dashboard of synthetic retail sales with revenue by category."
+order: 1
+credits: "Shashank Chaubey contributed the floating navbar, the sign-in dialog, and the compact phone header with swipeable tabs (3 of the repo's 29 commits)."
+sources:
+  - "Repo docs: PROJECT_SPEC.md, docs/ARCHITECTURE.md, docs/AGENT_WORKFLOW.md, docs/PROJECT_STATUS.md, docs/CHANGELOG.md (v0.7.1 'Measured live', 2026-10-23)"
+  - "Test counts: PROJECT_STATUS.md check results, 2026-11-08; pytest re-run on 2026-11-08"
+  - "Endpoints: 18 routes in backend/app/main.py"
+  - "Live site and sign-in requirement: screenshot of tabulavibe-ai.vercel.app, 2026-11-08"
+updated: 2026-11-08
+---
+
+import TabulaViewArchitecture from "../../components/case/TabulaViewArchitecture.astro";
+import ScoreBars from "../../components/case/ScoreBars.astro";
+
+## Problem and why it matters
+
+Small businesses such as shops, salons and clinics keep their sales and bookings in spreadsheets. Answering "what do bookings look like by month and by region?" usually means learning a BI tool. An LLM asked to summarise a table can state figures that aren't in it.
+
+I wanted a tool that:
+
+- reports data problems instead of quietly fixing them;
+- calculates every figure in code;
+- lets AI explain only what the code has already computed.
+
+> "I built TabulaVibe to explore how a data-heavy workflow could be made faster and more intuitive. My goal was to improve the underlying performance while making the overall experience more useful and efficient."
+
+## Data
+
+- **Users' own files:** CSV or Excel (first sheet only). Files are processed in memory for each request and **never stored**.
+- **Two synthetic sample datasets,** generated from a fixed seed. Both have deliberate quality issues (missing values, duplicates, invalid numbers, inconsistent labels), so the quality report has something to show:
+  - retail sales: 720 orders across 4 regions and 5 categories in 2025;
+  - salon bookings: 300 bookings over six months.
+- **Cleaning without changing data.** A column becomes a number, date or yes/no when at least 90% of its non-missing values parse. The rest are counted as _invalid_: they're excluded from calculations but never altered. Labels that differ only by case or spacing are reported, and merging them is opt-in.
+- **The hard parts were the formats:**
+  - ten different "missing" tokens (`NA`, `null`, `-`, `#N/A` …);
+  - currency prefixes (₹, Rs, INR, $, €, £);
+  - Western (1,234,567) _and_ Indian (12,34,567) digit grouping;
+  - day-first dates (`03/04/2024` is read as 3 April, with a visible note);
+  - ambiguous values such as `1,2`, which are deliberately **not** treated as numbers.
+
+## Approach and architecture
+
+The backend is stateless. The browser keeps the file and sends it again with each request, so nothing needs to be stored on the server. Python does all the arithmetic. The AI analyst follows a 9-phase workflow, and code enforces a gate at the end of each phase.
+
+<TabulaViewArchitecture />
+
+1. **Profile:** inferred types, roles, missing values, invalid values, duplicates and label variants.
+2. **Analyse:** the LLM picks from 13 statistical tools, such as Welch's t-test, ANOVA, chi-square, correlation and trend. Python runs each tool and records the result as evidence (`E1`, `E2` …).
+3. **Ground:** every number in a finding must appear in the evidence it cites. Findings that fail are sent back for correction. If they still fail, they're flagged **"unverified"** and kept out of the overview.
+4. **Compare:** after an AI run, the rules-based analyst runs on the same file. A scorecard decides which analysis builds the dashboard.
+
+## Models, tools and key decisions
+
+| Decision             | What I chose                                                                                                            | What I rejected, and why                                                                                                                                               |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Who computes numbers | Python: pandas and statistics tested against hand-computed values                                                       | Letting the LLM calculate. Its figures can't be checked, and the live runs showed it states numbers that aren't in the evidence                                        |
+| LLM provider         | Groq first. On any failure, the _same conversation_ continues on NVIDIA. If both fail, a rules-based analyst takes over | A single provider. Groq's free plan allows 8,000 tokens a minute, and one analyst request is about 7,600 tokens before results, so analyst runs usually move to NVIDIA |
+| Models               | `openai/gpt-oss-120b` (Groq) and `nvidia/nemotron-3.5-lightning-30b-a3b` (NVIDIA), chosen by a live tool-calling test   | Llama 3.3 70B, which both providers retired (requests returned 404 and 410). NVIDIA `gpt-oss-20b`, which timed out on analyst-sized requests                           |
+| Storage              | Re-upload per request; nothing kept on the server                                                                       | Object storage or server sessions. Re-uploading needs no database and makes "we don't keep your data" literally true                                                   |
+| Large-file engine    | pandas (kept for now)                                                                                                   | Polars: with pyarrow it's too large for a 250 MB Lambda package. DuckDB fits, and a prototype was faster, but only if the whole data layer moves to it. Parked         |
+| Machine learning     | Descriptive statistics only. PCA and regression run only when justified                                                 | Predictive or causal claims from a single uploaded file                                                                                                                |
+| Hosting              | Vercel (live). An AWS SAM template is also prepared and tested in the official Lambda image                             | Deploying to AWS without an account set up for it. The template and deploy script are ready                                                                            |
+
+## Evaluation
+
+After every AI run, Python scores the AI analysis and the rules-based analysis on the same file:
+
+| Criterion                                          | Weight |
+| -------------------------------------------------- | ------ |
+| Findings whose numbers match their evidence        | 30     |
+| High-priority questions answered                   | 25     |
+| Phase gates passed                                 | 20     |
+| Totals reconcile with an independent recalculation | 15     |
+| Hypotheses resolved (supported or not)             | 10     |
+
+The higher score builds the dashboard; a tie goes to the AI.
+
+<ScoreBars
+  caption="Live runs on the two synthetic samples (free plans, 23 Oct 2026). Score out of 100"
+  max={100}
+  rows={[
+    { label: "Rules-based analyst", note: "both samples", value: 100, emphasis: true },
+    { label: "AI analyst (NVIDIA Nemotron)", note: "sample A", value: 75.6 },
+    { label: "AI analyst (NVIDIA Nemotron)", note: "sample B", value: 69.6 },
+  ]}
+/>
+
+The AI completed every phase in 2.5–4 minutes but lost on both samples. Some of its findings contained figures that weren't in their evidence. The scorecard caught them, and the rules-based analysis built the dashboard, which is exactly what the check is for.
+
+**Software tests (8 Nov 2026):**
+
+- 309 backend tests (pytest)
+- 48 frontend tests (Vitest)
+- 10 browser journeys (Playwright, desktop and Pixel 7, light and dark)
+
+Calculations are checked against hand-computed fixtures and an independent implementation using Python's `csv` module.
+
+## Results
+
+- **Live since 21 Oct 2026** at tabulavibe-ai.vercel.app, with Google and GitHub sign-in.
+- **18 API endpoints:** profile, analyse, export, AI analyst, Ask AI, reports and accounts.
+- **Ask AI:** a chat about the report. On Groq's free plan, live answers took 5–16 seconds, with every number checked against recomputed evidence.
+- **Reports** download as PDF or PowerPoint.
+
+## Deployment
+
+- **Vercel (Hobby):** built from the GitHub `main` branch. FastAPI runs as a serverless function.
+  - Uploads are capped at 3.5 MB on Vercel (the platform limit). A self-hosted install allows 100 MB.
+  - The AI analyst has a 200-second deadline, to stay inside Vercel's 300-second function limit, and is rate-limited per user.
+- **Supabase:**
+  - Google and GitHub sign-in (OAuth with PKCE).
+  - Postgres row-level security: each user can only read their own rows.
+  - Saved reports hold aggregates only, never rows.
+- **Secrets** live only in environment variables, and the browser never sees a key. A secret scan and dependency audits found nothing.
+
+## Limitations and what I'd do next
+
+- **The AI analyst lost to the rules on both samples.** The grounding check works, but the AI's findings need to get better. The evaluation also covers only two synthetic samples.
+- **Free-plan limits:**
+  - Groq's free plan can't take a full analyst request, so most runs use NVIDIA, at about 30 seconds per reply.
+  - The live site caps files at 3.5 MB.
+  - Large Excel files read slowly.
+- **Format coverage:** only the first Excel sheet is read, and dates must use one of a fixed list of formats per column.
+- **Sign-in reloads the page,** which closes an open file.
+- **Next:**
+  - report templates, to re-run a saved analysis on next month's file;
+  - a DuckDB data layer for large files;
+  - a larger evaluation set;
+  - a benchmark of the faster type detection, re-run on a quiet machine before I quote any speed-up.

@@ -1,0 +1,105 @@
+---
+title: "An inbox assistant that summarises, classifies and drafts replies with Gemini"
+name: "AI Email Assistant"
+summary: "A FastAPI service that reads the latest Gmail messages, runs four Gemini tasks on each (sentiment, summary, classification, draft reply) and stores them in ChromaDB, reusing the closest past reply as a tone example."
+result: "Works end to end against Gmail: 4 Gemini tasks per email and 3 API endpoints. Ships with fictional sample data, so anyone can run the storage and search without a Gmail account."
+types: ["LLM/GenAI"]
+tech: ["Python", "FastAPI", "Gmail API", "Gemini 2.5 Flash", "ChromaDB", "Sentence Transformers", "better-profanity"]
+links:
+  github: "https://github.com/ShiwamMishra-0599k/Email-management"
+order: 2
+related: ["tabulaview"]
+sources:
+  - "Repo code: main.py (endpoints, auto-reply rule, 5-email fetch via extract_emails.py), call_gemini.py (model and prompts), similarity_search.py (top-1 retrieval)"
+  - "Sample-data check: seed_sample_db.py run on 2026-11-08 (6 emails stored, matching email retrieved, re-run adds 0)"
+  - "Decisions the original README lists as dropped: DistilBERT, OpenAI embeddings, rule-based classification"
+updated: 2026-11-08
+---
+
+import EmailAssistantPipeline from "../../components/case/EmailAssistantPipeline.astro";
+
+## Problem and why it matters
+
+A busy inbox mixes things that need a reply today with newsletters and notifications. Reading, sorting and answering routine mail by hand takes time, and replies drift in tone.
+
+I wanted an assistant that could:
+
+- summarise each email;
+- label it by urgency, intent and topic;
+- draft a reply in a consistent tone;
+- leave the final decision to a person.
+
+## Data
+
+- **Live input:** the 5 latest messages in a Gmail inbox, fetched through the Gmail API with OAuth.
+- **What's stored:** each processed email, with its labels and draft reply, in a local ChromaDB store. Login files (`credentials.json`, `token.json`), the `.env` file and the local store are all excluded from git.
+- **Public sample data:** the repo ships 6 hand-written, **fictional** emails (meeting change, invoice reminder, security alert, event, weekly report, newsletter). They use only `example.com` addresses. `seed_sample_db.py` loads them into ChromaDB, so you can try storage and similarity search without Gmail or an API key.
+- **Challenges:**
+  - HTML-heavy marketing emails;
+  - empty bodies;
+  - getting reliable JSON out of the model for classification.
+
+## Approach and architecture
+
+<EmailAssistantPipeline />
+
+1. **Fetch** the 5 latest inbox messages.
+2. **Guardrail:** flag profanity before anything is generated.
+3. **Four Gemini calls:** sentiment, a summary, a classification _of the summary_ returned as JSON (urgency, intent, topic), and a draft reply.
+4. **Memory:** embed the email (all-MiniLM-L6-v2), store it in ChromaDB, and retrieve the most similar past email. Its reply goes into the prompt as a tone and structure example.
+5. **Decide:** an email is flagged for auto-reply only if it is not urgent and not FYI. Urgent mail is left for a person.
+
+## Models, tools and key decisions
+
+| Decision              | What I chose                                                                  | What I rejected, and why                                                                   |
+| --------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Language tasks        | One model, Gemini 2.5 Flash, for sentiment, summary, classification and reply | DistilBERT for classification, judged too slow for real-time use (not measured)            |
+| Classification output | Structured JSON parsed into fixed labels                                      | Free-text labels, which can't drive a rule                                                 |
+| What gets classified  | The summary, so the classifier sees a short, clean input                      | The raw body, which includes HTML and footers                                              |
+| Embeddings            | all-MiniLM-L6-v2, run locally with Sentence Transformers                      | OpenAI embeddings, which would mean a second paid API alongside Gemini                     |
+| Vector store          | ChromaDB, persistent on disk, no server                                       | Postgres + pgvector, kept as a later step for scale                                        |
+| Use of retrieval      | The closest past reply, as a _tone example_                                   | Treating retrieval as a fact source. The project doesn't ground facts and doesn't claim to |
+| Safety                | Profanity flag and the "urgent or FYI → no auto-reply" rule                   | Fully automatic sending                                                                    |
+
+## Evaluation
+
+**There's no formal evaluation yet,** and I don't claim accuracy numbers.
+
+What was checked:
+
+- The full pipeline ran against a real inbox during development: fetch, analyse, store, look up and send.
+- The fictional sample data was re-tested on 8 Nov 2026:
+  - all 6 emails were stored;
+  - a "can we reschedule the meeting?" query retrieved the meeting-change email;
+  - a second run added no duplicates.
+
+What I'd measure next:
+
+- Classification accuracy against a hand-labelled set of fictional emails.
+- How often a person would send a draft without editing it.
+
+## Results
+
+- A working FastAPI service with **3 endpoints**:
+  - process the latest emails;
+  - get a stored email with its labels and draft;
+  - send a reply.
+- **4 Gemini tasks** per email, with classification returned as structured JSON.
+- A public repo that **anyone can run safely**, with fictional sample data and no secrets or personal data committed.
+
+## Deployment
+
+- Runs locally with `uvicorn`. It isn't hosted, because it needs each user's own Gmail OAuth login.
+- Secrets live only in `.env`, which git ignores. The repo includes a `.env.example`.
+
+## Limitations and what I'd do next
+
+- Synchronous and single-user. Each call processes 5 emails, one after another.
+- Sentiment is stored but not yet used for routing.
+- Gmail thread and message IDs aren't stored, so sent replies don't thread. The send endpoint also generates a fresh reply instead of sending the stored draft.
+- No tests or evaluation set yet. `requirements.txt` still lists packages the code no longer uses (VADER, pgvector).
+- **Next:**
+  - store thread IDs and send the reviewed draft;
+  - add a labelled test set and unit tests;
+  - route by urgency and sentiment;
+  - move the store to Postgres + pgvector.

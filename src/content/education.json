@@ -1,0 +1,23 @@
+{
+  "_note": "Exactly the list Shiwam confirmed on 8 Nov 2026. No CGPA. Certificate dates left out until Shiwam verifies them (add a `date` field then).",
+  "degrees": [
+    {
+      "title": "Bachelor of Pharmacy (B.Pharm)",
+      "institution": "Birla Institute of Technology, Mesra",
+      "date": "2024",
+      "note": "A background in healthcare and pharmaceutical science."
+    }
+  ],
+  "training": [
+    {
+      "title": "Data Science Training Program",
+      "institution": "DataMites",
+      "detail": "8-month program, including four capstone projects"
+    }
+  ],
+  "certifications": [
+    { "title": "Google Data Analytics Professional Certificate", "issuer": "Google · Coursera" },
+    { "title": "Career Essentials in Generative AI", "issuer": "Microsoft & LinkedIn" },
+    { "title": "Career Essentials in Data Analysis", "issuer": "Microsoft & LinkedIn" }
+  ]
+}

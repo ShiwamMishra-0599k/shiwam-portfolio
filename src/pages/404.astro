@@ -1,0 +1,23 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Page not found" description="This page doesn't exist." noindex>
+  <section aria-labelledby="nf-title" class="bg-cream">
+    <div class="mx-auto max-w-(--container-content) px-4 py-28 sm:px-6 md:py-40 lg:px-8">
+      <p class="font-display text-h3 text-forest-muted">404</p>
+      <h1 id="nf-title" class="mt-4 text-h1">
+        This page doesn't exist.
+      </h1>
+      <p class="mt-6 max-w-xl text-lead text-forest-muted">The link may be old, or the address may have a typo.</p>
+      <div class="mt-10 flex flex-wrap gap-4">
+        <a href="/" class="btn-primary">
+          Back to home
+        </a>
+        <a href="/#projects" class="btn-secondary">
+          See projects
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

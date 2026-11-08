@@ -1,0 +1,53 @@
+{
+  "_note": "Only skills shown in a public repo or a featured project. `evidence` is the project(s) to point an interviewer to. No progress bars or levels. Excluded on purpose: PyTorch, MLflow, AWS, Kafka, NATS, Tableau (no public code), and tools used only in unpublished work.",
+  "groups": [
+    {
+      "title": "Languages",
+      "items": ["Python", "SQL", "TypeScript"],
+      "evidence": "TabulaView.ai (Python backend, TypeScript/React frontend, SQL migrations) · Indian General Election 2024 SQL analysis"
+    },
+    {
+      "title": "ML & statistics",
+      "items": [
+        "scikit-learn",
+        "XGBoost",
+        "Keras / TensorFlow",
+        "SciPy",
+        "Hypothesis testing (t-test, ANOVA, chi-square)",
+        "Multiple-testing correction (Holm)",
+        "PCA & regression"
+      ],
+      "evidence": "TabulaView.ai statistics engine · Walking-Running and PUBG notebooks on GitHub"
+    },
+    {
+      "title": "LLM / GenAI",
+      "items": [
+        "LLM tool calling",
+        "Structured JSON output",
+        "Grounding checks against evidence",
+        "Provider fallback (Groq → NVIDIA)",
+        "Gemini API",
+        "Embeddings & vector search (ChromaDB, Sentence Transformers)"
+      ],
+      "evidence": "TabulaView.ai AI analyst · AI Email Assistant"
+    },
+    {
+      "title": "Data & engineering",
+      "items": [
+        "pandas",
+        "NumPy",
+        "Data-quality profiling",
+        "FastAPI",
+        "PostgreSQL (Supabase, row-level security)",
+        "pytest",
+        "Playwright"
+      ],
+      "evidence": "TabulaView.ai (309 backend tests, Playwright journeys) · AI Email Assistant"
+    },
+    {
+      "title": "Cloud & tools",
+      "items": ["Vercel", "Supabase", "Git & GitHub", "Power BI", "Jupyter"],
+      "evidence": "TabulaView.ai (live on Vercel, Supabase sign-in) · Bank Loan Report (Power BI) on GitHub"
+    }
+  ]
+}

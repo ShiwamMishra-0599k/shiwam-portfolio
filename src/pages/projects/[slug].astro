@@ -1,0 +1,199 @@
+---
+import { Image } from "astro:assets";
+import { render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import TableWrap from "../../components/case/TableWrap.astro";
+import { getProjects, relatedTo, type Project } from "../../lib/projects";
+import { projectJsonLd } from "../../lib/seo";
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((project) => ({ params: { slug: project.id }, props: { project, all: projects } }));
+}
+
+interface Props {
+  project: Project;
+  all: Project[];
+}
+const { project, all } = Astro.props;
+const { data } = project;
+const { Content, headings } = await render(project);
+const toc = [...headings.filter((h) => h.depth === 2), { depth: 2, slug: "links", text: "Links" }];
+const related = relatedTo(project, all);
+const updated = data.updated.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+---
+
+<BaseLayout
+  title={data.name}
+  description={data.summary}
+  ogImage={`/og/${project.id}.png`}
+  ogImageAlt={`${data.name} case study: ${data.title}`}
+  ogType="article"
+  jsonLd={projectJsonLd(project)}
+>
+  <article>
+    <header class="tone-dark bg-forest text-cream">
+      <div class="mx-auto max-w-(--container-content) px-4 pt-10 pb-16 sm:px-6 md:pt-14 md:pb-20 lg:px-8">
+        <nav aria-label="Breadcrumb" class="text-sm">
+          <ol class="flex flex-wrap gap-2 text-cream-muted">
+            <li>
+              <a href="/" class="link-underline">
+                Home
+              </a>{" "}
+              <span aria-hidden="true">/</span>
+            </li>
+            <li>
+              <a href="/#projects" class="link-underline">
+                Projects
+              </a>{" "}
+              <span aria-hidden="true">/</span>
+            </li>
+            <li aria-current="page" class="text-cream">
+              {data.name}
+            </li>
+          </ol>
+        </nav>
+
+        <p class="mt-10 text-sm font-semibold tracking-[0.14em] text-cream-muted uppercase">Case study · {data.name}</p>
+        <h1 class="mt-4 max-w-4xl text-h1">{data.title}</h1>
+        <p class="mt-6 max-w-3xl text-lead text-cream-muted">{data.summary}</p>
+
+        <p class="mt-8 max-w-3xl border-l-4 border-pink pl-4 text-lead">
+          <span class="sr-only">Result: </span>
+          {data.result}
+        </p>
+
+        <div class="mt-10 flex flex-wrap items-center gap-4">
+          {data.links.demo && (
+            <a href={data.links.demo} class="btn-primary" rel="noopener">
+              Live demo <span aria-hidden="true">↗</span>
+            </a>
+          )}
+          {data.links.github && (
+            <a href={data.links.github} class="btn-secondary" rel="noopener">
+              GitHub <span aria-hidden="true">↗</span>
+            </a>
+          )}
+          {data.links.writeup && (
+            <a href={data.links.writeup} class="link-underline font-semibold" rel="noopener">
+              Technical write-up <span aria-hidden="true">↗</span>
+            </a>
+          )}
+        </div>
+        {data.links.demoNote && <p class="mt-4 text-sm text-cream-muted">{data.links.demoNote}</p>}
+
+        <dl class="mt-12 grid gap-6 border-t border-line-dark pt-8 text-sm sm:grid-cols-2">
+          <div>
+            <dt class="font-semibold tracking-[0.14em] text-cream-muted uppercase">Type</dt>
+            <dd class="mt-2">{data.types.join(" · ")}</dd>
+          </div>
+          <div>
+            <dt class="font-semibold tracking-[0.14em] text-cream-muted uppercase">Stack</dt>
+            <dd class="mt-2">{data.tech.join(" · ")}</dd>
+          </div>
+        </dl>
+      </div>
+    </header>
+
+    {data.cover && (
+      <div class="bg-[linear-gradient(to_bottom,var(--color-forest)_50%,var(--color-cream)_50%)]">
+        <div class="mx-auto max-w-(--container-content) px-4 sm:px-6 lg:px-8">
+          <figure>
+            <Image
+              src={data.cover}
+              alt={data.coverAlt ?? ""}
+              widths={[640, 960, 1280, 1600]}
+              sizes="(min-width: 1152px) 1088px, 100vw"
+              class="w-full rounded-2xl shadow-[6px_6px_0_0_var(--color-pink)] ring-1 ring-line"
+              loading="eager"
+              fetchpriority="high"
+            />
+          </figure>
+        </div>
+      </div>
+    )}
+
+    <div class="bg-cream">
+      <div class="mx-auto grid max-w-(--container-content) grid-cols-1 gap-12 px-4 py-16 sm:px-6 md:py-20 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-16 lg:px-8">
+        <aside class="lg:sticky lg:top-28 lg:self-start">
+          <nav aria-labelledby="toc-title">
+            <p id="toc-title" class="text-sm font-semibold tracking-[0.14em] text-forest-muted uppercase">
+              On this page
+            </p>
+            <ol class="mt-4 space-y-2 border-l-2 border-line pl-4 text-[0.95rem]">
+              {toc.map((h) => (
+                <li>
+                  <a href={`#${h.slug}`} class="link-underline">
+                    {h.text}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        </aside>
+
+        <div class="prose min-w-0">
+          <Content components={{ table: TableWrap }} />
+
+          <h2 id="links">Links</h2>
+          <ul>
+            {data.links.demo && (
+              <li>
+                <a href={data.links.demo} rel="noopener">
+                  Live demo
+                </a>
+                {data.links.demoNote && <> ({data.links.demoNote})</>}
+              </li>
+            )}
+            {data.links.github && (
+              <li>
+                <a href={data.links.github} rel="noopener">
+                  Source code on GitHub
+                </a>
+              </li>
+            )}
+            {data.links.writeup && (
+              <li>
+                <a href={data.links.writeup} rel="noopener">
+                  Technical write-up
+                </a>
+              </li>
+            )}
+          </ul>
+          {data.credits && (
+            <p>
+              <strong>Credits:</strong> {data.credits}
+            </p>
+          )}
+          <details class="mt-8 rounded-lg border border-line bg-cream-soft px-4 py-3 text-base">
+            <summary class="cursor-pointer font-semibold">Where the numbers come from</summary>
+            <ul class="mt-3">
+              {data.sources.map((s) => (
+                <li>{s}</li>
+              ))}
+            </ul>
+            <p class="mt-3 text-sm text-forest-muted">Last checked {updated}.</p>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    {related.length > 0 && (
+      <section aria-labelledby="related-title" class="bg-cream-deep">
+        <div class="mx-auto max-w-(--container-content) px-4 py-16 sm:px-6 md:py-20 lg:px-8">
+          <h2 id="related-title" class="text-h2">
+            Related projects
+          </h2>
+          <ul class="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {related.map((p, i) => (
+              <li data-reveal style={`--reveal-delay:${i * 90}ms`}>
+                <ProjectCard project={p} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )}
+  </article>
+</BaseLayout>

@@ -1,0 +1,39 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/Section.astro";
+import Hero from "../components/Hero.astro";
+import About from "../components/About.astro";
+import ProjectsGrid from "../components/ProjectsGrid.astro";
+import Skills from "../components/Skills.astro";
+import Education from "../components/Education.astro";
+import Contact from "../components/Contact.astro";
+import { getProjects } from "../lib/projects";
+import { personJsonLd, websiteJsonLd } from "../lib/seo";
+
+const projects = await getProjects();
+
+// All content comes from src/content (see CLAUDE.md). No invented content.
+---
+
+<BaseLayout jsonLd={[personJsonLd(), websiteJsonLd()]}>
+  <Hero />
+
+  <Section
+    id="projects"
+    tone="dark"
+    index={1}
+    eyebrow="Projects"
+    title="Featured projects"
+    intro="Each project links to its code and a case study: the problem, the data, the decisions, how it was evaluated, and what it still can't do."
+  >
+    <ProjectsGrid projects={projects} />
+  </Section>
+
+  <Skills />
+
+  <Education />
+
+  <About />
+
+  <Contact />
+</BaseLayout>
